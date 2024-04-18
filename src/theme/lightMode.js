@@ -4,8 +4,7 @@ const lightColors = {
         color_3: '#FBFBFB',
         color_4: '#93A267',
         color_5: '#BDE8B7',
-        color_5: '#BDE8B7',
-        color_5: '#85B380',
+        color_6: '#85B380',
 
         backgroundColor: '#fff',
         backgroundColor_1: '#49724B',

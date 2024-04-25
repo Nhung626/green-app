@@ -30,7 +30,7 @@ export const updateTreeAction = createAsyncThunk(
 export const searchTreeAction = createAsyncThunk(
     'tree/searchTreeAction',
     async (data: {}) => {
-        const res = await httpClient.get(TREE.SEARCH, data)
+        const res = await formdata.post(TREE.SEARCH, data)
         return res.data
     }
 )

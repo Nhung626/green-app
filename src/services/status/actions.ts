@@ -14,7 +14,7 @@ export const getStatusAction = createAsyncThunk(
 export const createStatusAction = createAsyncThunk(
     'status/createStatusAction',
     async (data: {}) => {
-        const res = await formdata.put(STATUS.CREATE, data)
+        const res = await formdata.post(STATUS.CREATE, data)
         return res.data
     }
 )
@@ -22,7 +22,7 @@ export const createStatusAction = createAsyncThunk(
 export const updateStatusAction = createAsyncThunk(
     'status/updateStatusAction',
     async (data: {}) => {
-        const res = await formdata.put(STATUS.UPDATE, data)
+        const res = await formdata.post(STATUS.UPDATE, data)
         return res.data
     }
 )
@@ -30,7 +30,7 @@ export const updateStatusAction = createAsyncThunk(
 export const searchStatusAction = createAsyncThunk(
     'status/searchStatusAction',
     async (data: {}) => {
-        const res = await httpClient.get(STATUS.SEARCH, data)
+        const res = await formdata.post(STATUS.SEARCH, data)
         return res.data
     }
 )
@@ -46,7 +46,8 @@ export const deleteStatusAction = createAsyncThunk(
 export const likeStatusAction = createAsyncThunk(
     'status/likeStatusAction',
     async (data: {}) => {
-        const res = await httpClient.post(STATUS.LIKE, data)
+        const res = await formdata.post(STATUS.LIKE, data)
+        console.log(data)
         return res.data
     }
 )
@@ -54,7 +55,7 @@ export const likeStatusAction = createAsyncThunk(
 export const unlikeStatusAction = createAsyncThunk(
     'status/unlikeStatusAction',
     async (data: {}) => {
-        const res = await httpClient.post(STATUS.UNLIKE, data)
+        const res = await formdata.post(STATUS.UNLIKE, data)
         return res.data
     }
 )

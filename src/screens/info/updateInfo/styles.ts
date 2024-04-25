@@ -27,13 +27,14 @@ const styles = () => {
       height: SCREEN_WIDTH / 16 * 9,
       overflow: 'hidden',
     },
-    avata:{
-      borderWidth:1, 
-      borderRadius: 100, 
-      borderColor:theme.color_1,
-      position: 'absolute', 
-      top:100, 
-      left: 10},
+    avata: {
+      borderWidth: 1,
+      borderRadius: 100,
+      borderColor: theme.color_1,
+      position: 'absolute',
+      top: 100,
+      left: 10
+    },
     imgAvt: {
       resizeMode: "cover",
       height: 160,
@@ -51,6 +52,15 @@ const styles = () => {
       paddingHorizontal: 15,
       paddingVertical: 20,
       textAlign: 'center',
+    },
+    header1: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      fontSize: 25,
+      fontWeight: "600",
+      color: theme.text_3,
+      paddingHorizontal: 15,
+      paddingVertical: 10,
     },
     title: {
       color: theme.text_3,
@@ -99,13 +109,55 @@ const styles = () => {
     button: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent:'center',
+      justifyContent: 'center',
       padding: 15,
       marginTop: 20,
       marginLeft: 65,
       borderRadius: 35,
       backgroundColor: theme.text_3,
       width: '55%',
+    },
+    headerText: {
+      color: theme.color_1,
+      fontSize: 24,
+      fontWeight: '600',
+    },
+    dropdownButtonStyle: {
+      height: 40,
+      backgroundColor: theme.color_2,
+      borderRadius: 20,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 12,
+      marginTop: 5,
+    },
+    dropdownButtonTxtStyle: {
+      flex: 1,
+      fontSize: 15,
+      fontWeight: '400',
+      color: theme.color_1,
+    },
+    dropdownButtonArrowStyle: {
+      fontSize: 28,
+    },
+    dropdownMenuStyle: {
+      backgroundColor: theme.color_2,
+      borderRadius: 20,
+    },
+    dropdownItemStyle: {
+      width: '100%',
+      flexDirection: 'row',
+      paddingHorizontal: 12,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: 8,
+    },
+    dropdownItemTxtStyle: {
+      flex: 1,
+      fontSize: 18,
+      fontWeight: '500',
+      color: theme.color_1,
     },
 
 

@@ -14,7 +14,7 @@ export const getGardenAction = createAsyncThunk(
 export const createGardenAction = createAsyncThunk(
     'garden/createGardenAction',
     async (data: {}) => {
-        const res = await formdata.put(GARDEN_INFO.CREATE, data)
+        const res = await formdata.post(GARDEN_INFO.CREATE, data)
         return res.data
     }
 )
@@ -22,7 +22,7 @@ export const createGardenAction = createAsyncThunk(
 export const updateGardenAction = createAsyncThunk(
     'garden/updateGardenAction',
     async (data: {}) => {
-        const res = await formdata.put(GARDEN_INFO.UPDATE, data)
+        const res = await formdata.post(GARDEN_INFO.UPDATE, data)
         return res.data
     }
 )
@@ -39,7 +39,16 @@ export const searchGardenAction = createAsyncThunk(
     'garden/searchGardenAction',
     async (data: {}) => {
         console.log(data)
-        const res = await formdata.get(GARDEN_INFO.SEARCH, data)
+        const res = await formdata.post(GARDEN_INFO.SEARCH, data)
+        return res.data
+    }
+)
+
+export const getFollowAction = createAsyncThunk(
+    'garden/getFollowAction',
+    async () => {
+        console.log()
+        const res = await httpClient.get(GARDEN_INFO.GET_FOLLOW)
         return res.data
     }
 )

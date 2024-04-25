@@ -9,31 +9,31 @@ export const AUTH = {
     LOGOUT: "/auth/logout",
 }
 
-export const MEDIA={
+export const MEDIA = {
     SELF: BASE_URL.concat("/media/self")
 }
 
-export const COMMENT ={
+export const COMMENT = {
     SELF: "/comment/self",
     CREATE: "/comment/create",
     SEARCH: "/comment/search",
     UPDATE: "/comment/update",
     DELETE: "/comment/delete",
     LIKE: "/comment/like",
-    UNLIKE: "/comment/like",
+    UNLIKE: "/comment/unlike",
 }
 
-export const COMMENT_POST ={
+export const COMMENT_POST = {
     SELF: "/comment-post/self",
     CREATE: "/comment-post/create",
     SEARCH: "/comment-post/search",
     UPDATE: "/comment-post/update",
     DELETE: "/comment-post/delete",
     LIKE: "/comment-post/like",
-    UNLIKE: "/comment-post/like",
+    UNLIKE: "/comment-post/unlike",
 }
 
-export const DIARY ={
+export const DIARY = {
     SELF: "/diary/self",
     CREATE: "/diary/create",
     SEARCH: "/diary/search",
@@ -41,16 +41,17 @@ export const DIARY ={
     DELETE: "/diary/delete",
 }
 
-export const GARDEN_INFO ={
+export const GARDEN_INFO = {
     SELF: "/garden-info/self",
     CREATE: "/garden-info/create",
     SEARCH: "/garden-info/search",
     UPDATE: "/garden-info/update",
     DELETE: "/garden-info/delete",
-    UPDATE_COVER: "garden-info/update-cover"
+    UPDATE_COVER: "garden-info/update-cover",
+    GET_FOLLOW: "garden-info/get-follows",
 }
 
-export const LAND ={
+export const LAND = {
     SELF: "/land/self",
     CREATE: "/land/create",
     SEARCH: "/land/search",
@@ -59,27 +60,30 @@ export const LAND ={
     UPDATE_IMAGE: "land/update-image"
 }
 
-export const POST ={
+export const POST = {
     SELF: "/post/self",
     CREATE: "/post/create",
     SEARCH: "/post/search",
     UPDATE: "/post/update",
     DELETE: "/post/delete",
     LIKE: "/post/like",
-    UNLIKE: "/post/like",
+    UNLIKE: "/post/unlike",
+    SAVE: "/post/save",
+    UNSAVE: "/post/unsave",
+    GETALLSAVE: 'post/get-all-save'
 }
 
-export const STATUS ={
+export const STATUS = {
     SELF: "/status/self",
     CREATE: "/status/create",
     SEARCH: "/status/search",
     UPDATE: "/status/update",
     DELETE: "/status/delete",
     LIKE: "/status/like",
-    UNLIKE: "/status/like",
+    UNLIKE: "/status/unlike",
 }
 
-export const TREE ={
+export const TREE = {
     SELF: "/tree/self",
     CREATE: "/tree/create",
     SEARCH: "/tree/search",
@@ -93,5 +97,7 @@ export const USER_INFO = {
     SEARCH: "/user-info/search",
     UPDATE: "/user-info/update",
     DELETE: "/user-info/delete",
-    UPDATE_AVATAR: "user-info/update-avata"
+    UPDATE_AVATAR: "user-info/update-avata",
+    FOLLOW: "user-info/follow",
+    UNFOLLOW: "user-info/unfollow",
 }

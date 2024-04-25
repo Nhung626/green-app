@@ -6,10 +6,25 @@ const styles = () => {
     const theme = useTheme();
     const st = StyleSheet.create({
         container: {
+            // flex: 1,
             borderRadius: 5,
-            backgroundColor:'white',
-            padding: 10,
+            backgroundColor: 'white',
+            paddingHorizontal: 15,
+            paddingVertical: 10,
+            marginVertical: 5,
             width: '100%',
+        },
+        header: {
+            marginTop: 40,
+            marginHorizontal: 20,
+            paddingVertical: 5,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+        },
+        headerText: {
+            color: theme.color_1,
+            fontSize: 20,
+            fontWeight: '600',
         },
         username: {
             marginLeft: 5,
@@ -36,9 +51,11 @@ const styles = () => {
             borderRadius: 5,
             flexDirection: 'column',
             justifyContent: 'flex-end',
-            alignContent: 'flex-end'
+            alignContent: 'flex-end',
+
         },
         textContent: {
+            marginBottom: 5,
             paddingRight: 5,
             fontSize: 15,
             color: theme.color_1

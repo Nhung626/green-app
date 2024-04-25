@@ -6,7 +6,7 @@ import { Avatar } from '@rneui/themed';
 import st from './styles'
 import useTheme from '../../../hooks/useTheme'
 import { useDispatch } from 'react-redux'
-import { useNavigation, useIsFocused } from "@react-navigation/native";
+import { useNavigation, useIsFocused, useRoute } from "@react-navigation/native";
 import { getInfoUserAction, searchInfoUserAction } from '../../../services/user/actions';
 import { getGardenAction, searchGardenAction, updateCoverAction } from '../../../services/garden/actions';
 import { getItemObjectAsyncStorage } from '../../../../utils/asyncStorage';
@@ -14,14 +14,20 @@ import { KEY_STORAGE } from '../../../constants/storage';
 import { MEDIA } from '../../../constants/api';
 import * as ImagePicker from 'expo-image-picker';
 import Loading from '../../../../utils/loading/loading';
+import { NAVIGATION_TITLE } from '../../../constants/navigation';
+import moment from 'moment';
 
 
-const MyProfile = ({gardenInfo, userInfo}) => {
+const MyProfile = () => {
   const styles = st();
   const theme = useTheme();
   const dispatch = useDispatch<any>()
   const isFocused = useIsFocused()
+  const route = useRoute<any>()
+  const gardenInfo = route.params.user;
+  const userInfo = route.params.user.userInfo;
   const [loading, setLoading] = useState(false)
+  const navigation = useNavigation<any>();
   let userId
   const getUserId = async () => {
     userId = await getItemObjectAsyncStorage(KEY_STORAGE.USER_ID);
@@ -30,8 +36,15 @@ const MyProfile = ({gardenInfo, userInfo}) => {
   const handleUpdateAvatar = async (avatar) => {
     setLoading(true)
     const req = new FormData();
-    req.append('userId', userId)
-    req.append('avatar', avatar, "avata")
+    req.append('userId', gardenInfo.userId)
+    if (avatar) {
+      //@ts-ignore
+      userInfo.append(`avatar`, {
+        uri: avatar,
+        type: 'image/png',
+        name: `avatar.png`,
+      });
+    }
     try {
       const res = await dispatch(updateCoverAction(req));
       if (res?.payload) {
@@ -51,7 +64,7 @@ const MyProfile = ({gardenInfo, userInfo}) => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [4, 4],
       quality: 1,
     });
 
@@ -64,8 +77,21 @@ const MyProfile = ({gardenInfo, userInfo}) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={theme.backgroundColor} />
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+        >
+          <Icon name="remove" style={{ marginRight: 0, marginTop: 5 }} color={theme.color_1} size={20}></Icon>
+        </TouchableOpacity>
+        <Text style={styles.headerText}>My Profile</Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate(NAVIGATION_TITLE.UPDATE_INFO, {data: gardenInfo})}
+        >
+          <Icon name="edit" style={{ marginRight: 0, marginTop: 5 }} color={theme.color_1} size={20}></Icon>
+        </TouchableOpacity>
+      </View>
       <ImageBackground
-        source={require('../../../assets/images/paper.png')}
+        source={require('../../../../assets/images/paper.png')}
         resizeMode="cover">
         <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
           <Image source={{ uri: `${MEDIA.SELF}?id=${userInfo?.avatarId}` }} style={styles.avata} />
@@ -78,7 +104,7 @@ const MyProfile = ({gardenInfo, userInfo}) => {
           <Text style={styles.userName}>VƯỜN CỦA {gardenInfo?.name.toUpperCase()}</Text>
           <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
             <Image
-              source={require('../../../assets/images/icon/ic_leaf.png')}
+              source={require('../../../../assets/images/icon/ic_leaf.png')}
               style={styles.iconBio}
             />
             <Text style={styles.bio}>{gardenInfo?.description}</Text>
@@ -90,7 +116,7 @@ const MyProfile = ({gardenInfo, userInfo}) => {
         <ScrollView style={styles.scroll}>
           <View style={styles.fix}>
             <Image
-              source={require('../../../assets/images/icon/ic_user.png')}
+              source={require('../../../../assets/images/icon/ic_user.png')}
               style={styles.icon}
               resizeMode="contain"
             />
@@ -99,36 +125,25 @@ const MyProfile = ({gardenInfo, userInfo}) => {
 
           <View style={styles.fix}>
             <Image
-              source={require('../../../assets/images/icon/ic_garden.png')}
+              source={require('../../../../assets/images/icon/ic_garden.png')}
               style={styles.icon}
               resizeMode="contain"
             />
-            <Text style={styles.text}>Ngày sinh: {userInfo.dateOfBirth} </Text>
+            <Text style={styles.text}>Ngày sinh: {moment(userInfo.dateOfBirth).format('DD-MM-YYYY')} </Text>
           </View>
           <View style={styles.fix}>
             <Image
-              source={require('../../../assets/images/icon/ic_status.png')}
+              source={require('../../../../assets/images/icon/ic_status.png')}
               style={styles.icon}
               resizeMode="contain"
             />
             <Text style={styles.text}>Địa chỉ: {userInfo.address}</Text>
           </View>
 
-          <View style={styles.fix}>
-            <Image
-              source={require('../../../assets/images/icon/ic_save.png')}
-              style={styles.icon}
-              resizeMode="contain"
-            />
-            <Text style={styles.text}>
-              Đã lưu
-            </Text>
-          </View>
-
           <TouchableOpacity>
             <View style={styles.fix}>
               <Image
-                source={require('../../../assets/images/icon/ic_logout.png')}
+                source={require('../../../../assets/images/icon/ic_logout.png')}
                 style={styles.icon}
                 resizeMode="contain"
               />
@@ -138,7 +153,7 @@ const MyProfile = ({gardenInfo, userInfo}) => {
             </View>
           </TouchableOpacity>
         </ScrollView>
-        <Loading visiable={loading} />
+        {/* <Loading visiable={loading} /> */}
       </View>
     </SafeAreaView >
   );

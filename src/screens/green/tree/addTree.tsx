@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     Image,
     ToastAndroid,
+    StatusBar,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -21,31 +22,38 @@ import SelectDropdown from 'react-native-select-dropdown'
 import { useDispatch } from "react-redux";
 import { searchLandAction } from "../../../services/land/actions";
 import { createTreeAction, updateTreeAction } from "../../../services/tree/actions";
+import Loading from "../../../../utils/loading/loading";
+import { getItemObjectAsyncStorage } from "../../../../utils/asyncStorage";
+import { KEY_STORAGE } from "../../../constants/storage";
 
 const AddTree = () => {
     const theme = useTheme();
     const styles = st();
     const route = useRoute<any>();
-    const mode = route.params?.mode;
-    console.log('data: ', route.params);
-    const userId = route.params?.userId;
     const [startDate, setStartDate] = useState(new Date());
     const [viewStartDate, setViewStartDate] = useState(false)
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [image, setImage] = useState(null);
-    const navigation = useNavigation<any>()
+    const navigation = useNavigation<any>();
     const [name, setName] = useState('');
     const [typeTree, setTypeTree] = useState('');
+    const [sum, setSum] = useState('');
     const [landId, setLandId] = useState('');
-    const [loading, setLoading] = useState(false)
     const [listLand, setListLand] = useState()
     const dispatch = useDispatch<any>();
+    const [loading, setLoading] = useState(false)
+    let userId
+
+    const getUserId = async () => {
+        userId = await getItemObjectAsyncStorage(KEY_STORAGE.USER_ID);
+    }
 
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true)
+            await getUserId()
             try {
-                const res = await dispatch(searchLandAction({ 'userId': { userId } }));
+                const res = await dispatch(searchLandAction({ userId: userId }));
                 if (res.payload) {
                     setListLand(res.payload.body);
                 } else {
@@ -53,10 +61,8 @@ const AddTree = () => {
                 }
                 setLoading(false);
             } catch (error) {
-                console.error('Error fetching garden info:', error);
                 ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT);
                 setLoading(false);
-
             };
         }
         fetchData();
@@ -64,46 +70,34 @@ const AddTree = () => {
 
     const handleSaveTree = async () => {
         setLoading(true)
+        await getUserId()
         const req = new FormData();
-        
         if (image) {
             // @ts-ignore
-            req.append('img', {uri: image.uri, name: 'image.jpg', type: 'image/jpeg'});
+            req.append('img', { uri: image.uri, name: 'image.jpg', type: 'image/jpeg' });
         }
         // console.log(startDate.toString())
         req.append('startDate', moment(startDate).format('YYYY-MM-DD'));
         req.append('userId', userId);
         req.append('landId', landId);
         req.append('name', name);
+        req.append('sum', sum);
         req.append('type', typeTree);
         console.log(req)
 
         try {
-            let res
-            if (mode === 'create') {
-                // Xử lý logic để tạo mới
-                console.log('create')
-                res = await dispatch(createTreeAction(req));
 
-            } else if (mode === 'update') {
-                // Xử lý logic để cập nhật
-                console.log('update')
-                res = await dispatch(updateTreeAction(req));
-            }
-
+            // Xử lý logic để tạo mới
+            console.log('create')
+            const res = await dispatch(createTreeAction(req));
             if (res.payload) {
                 setLoading(false);
                 ToastAndroid.show('Cập nhật thành công!', ToastAndroid.SHORT);
-                if (mode === 'create') {
-                    navigation.navigate(NAVIGATION_TITLE.GREEN);
-                } else if (mode === 'update') {
-                    navigation.goBack();
-                }
+                navigation.goBack();
             } else {
                 ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT);
                 setLoading(false);
             }
-            console.log(res, 'update user');
         } catch (err) {
             console.log('Error:', err);
             setLoading(false);
@@ -145,6 +139,15 @@ const AddTree = () => {
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
+            <StatusBar backgroundColor={theme.color_2} />
+            <View style={styles.header}>
+                <TouchableOpacity
+                    onPress={() => navigation.goBack()}
+                >
+                    <Icon name="remove" style={{ marginRight: 0, marginTop: 5 }} color={theme.color_1} size={25}></Icon>
+                </TouchableOpacity>
+                <Text style={styles.headerText}>Thêm cây </Text>
+            </View>
             <ScrollView >
                 <View style={{}}>
                     <TouchableOpacity onPress={() => pickImage()} style={{}}>
@@ -178,6 +181,17 @@ const AddTree = () => {
                                 placeholderTextColor="grey"
                                 onChangeText={(text) => { setTypeTree(text) }}
                                 value={typeTree}
+                            />
+                        </View>
+
+                        <View style={{}}>
+                            <Text style={styles.text}>Số lượng</Text>
+                            <TextInput
+                                placeholder=""
+                                style={styles.inputBox}
+                                placeholderTextColor="grey"
+                                onChangeText={(text) => { setSum(text) }}
+                                value={sum}
                             />
                         </View>
 
@@ -217,29 +231,13 @@ const AddTree = () => {
                             </View>
                         </TouchableOpacity>
 
-                        <View style={{}}>
-                            <Text style={styles.text}>Mô tả</Text>
-                            <TextInput
-                                editable
-                                textAlignVertical="top"
-                                style={styles.inputBox}
-                                multiline={true}
-                                numberOfLines={6}
-                                maxLength={50}
-                                cursorColor={'gray'}
-                                placeholderTextColor="grey"
-                            // onChangeText={}
-                            // value={info.description}
-                            />
-
-                        </View>
-
                         <Text style={styles.text}>Ở mảnh đất nào?</Text>
                         <SelectDropdown
                             data={listLand}
                             onSelect={(selectedItem, index) => {
                                 setLandId(selectedItem.id)
                             }}
+
                             renderButton={renderButton}
                             renderItem={renderItem}
                             showsVerticalScrollIndicator={false}
@@ -256,6 +254,7 @@ const AddTree = () => {
                 </View>
 
             </ScrollView>
+            <Loading visiable={loading} />
         </SafeAreaView >
     );
 }

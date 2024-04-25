@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Text, StyleSheet, StatusBar, View, Image, ImageBackground, TouchableOpacity, ScrollView, Alert, ToastAndroid } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -7,9 +7,11 @@ import st from './styles'
 import useTheme from '../../hooks/useTheme'
 import { useDispatch } from 'react-redux'
 import { useNavigation, useIsFocused } from "@react-navigation/native";
-import { getInfoUserAction, searchInfoUserAction } from '../../services/user/actions';
+import { useFocusEffect } from '@react-navigation/native';
+
+import { getInfoUserAction, searchInfoUserAction, updateAatarAction } from '../../services/user/actions';
 import { getGardenAction, searchGardenAction, updateCoverAction } from '../../services/garden/actions';
-import { getItemObjectAsyncStorage } from '../../../utils/asyncStorage';
+import { clearAllAsyncStorage, getItemObjectAsyncStorage } from '../../../utils/asyncStorage';
 import { KEY_STORAGE } from '../../constants/storage';
 import { MEDIA } from '../../constants/api';
 import * as ImagePicker from 'expo-image-picker';
@@ -23,36 +25,21 @@ const Info = () => {
   const dispatch = useDispatch<any>()
   const isFocused = useIsFocused()
   const navigation = useNavigation<any>();
-
-  const [userInfo, setUserInfo] = useState({
-    "id": '',
-    "userId": '',
-    "avatarId": '',
-    "gender": '',
-    "dateOfBirth": "",
-    "phone": "",
-    "address": "",
-    "genderP": false,
-    "addressP": false,
-    "phoneP": false,
-    "dateOfBirthP": false
-  });
-  const [gardenInfo, setGardenInfo] = useState({
-    "id": "",
-    "userId": "",
-    "name": "",
-    "coverId": "",
-    "description": ""
-  });
+  const [avatar, setAvatar] = useState('');
+  const [userInfo, setUserInfo] = useState<any>();
+  const [gardenInfo, setGardenInfo] = useState<any>();
   const [loading, setLoading] = useState(false)
   let userId
   const getUserId = async () => {
     userId = await getItemObjectAsyncStorage(KEY_STORAGE.USER_ID);
   }
 
-  useEffect(() => {
-    getUserInfo()
-  }, [])
+  useFocusEffect(
+    useCallback(() => {
+      getUserInfo();
+    }, [])
+  );
+
 
   const getUserInfo = async () => {
     await getUserId();
@@ -71,52 +58,34 @@ const Info = () => {
       setLoading(false);
     }
   };
-  const onChangeGardenInfo = (name, value) => {
-    return () => {
-      setGardenInfo(prevState => ({ ...prevState, [name]: value }));
-      console.log('gardenInfo: ', gardenInfo)
-    }
-  }
 
-  const onChangeUserInfo = (name, value) => {
-    return () => {
-      setUserInfo(prevState => ({ ...prevState, [name]: value }));
-      console.log('userInfo', gardenInfo)
+  useEffect(() => {
+    if (avatar) {
+      handleUpdateAvatar();
     }
-  }
-  const handleUpdateCover = async (cover) => {
+  }, [avatar])
+
+  const handleUpdateAvatar = async () => {
+    await getUserId();
     setLoading(true)
     const req = new FormData();
     req.append('userId', userId)
-    req.append('cover', cover, "cover")
-    try {
-
-      const res = await dispatch(updateCoverAction(req));
-      if (res?.payload) {
-        setLoading(false);
-        const id = res.payload.body.id
-        onChangeGardenInfo('coverId', { id })
-        ToastAndroid.show('Cập nhật cover thành công!', ToastAndroid.SHORT)
-      }
-    } catch (err) {
-      console.error('Error update cover:', err);
-      ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT)
-      setLoading(false);
+    if (avatar) {
+      //@ts-ignore
+      req.append(`avatar`, {
+        uri: avatar,
+        type: 'image/png',
+        name: `avatar.png`,
+      });
     }
-  }
-
-  const handleUpdateAvatar = async (avatar) => {
-    setLoading(true)
-    const req = new FormData();
-    req.append('userId', userId)
-    req.append('avatar', avatar, "avata")
     try {
-      const res = await dispatch(updateCoverAction(req));
+      const res = await dispatch(updateAatarAction(req));
       if (res?.payload) {
         setLoading(false);
-        const id = res.payload.body.id
-        onChangeGardenInfo('coverId', { id })
+        setAvatar(null);
         ToastAndroid.show('Cập nhật avatar thành công!', ToastAndroid.SHORT)
+      } else {
+        setLoading(false);
       }
     } catch (err) {
       console.error('Error update avatar:', err);
@@ -129,45 +98,78 @@ const Info = () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [4, 4],
       quality: 1,
     });
 
     if (!result.canceled) {
-      await handleUpdateCover(result.assets[0].uri)
+      setAvatar(result.assets[0].uri)
       return
     }
   };
-  const pickCover = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [16, 9],
-      quality: 1,
-    });
 
-    if (!result.canceled) {
-      await handleUpdateCover(result.assets[0].uri)
-      return
-    }
-  };
+  const changeAvatar = () => {
+    Alert.alert(
+      'Xác nhận',
+      'Tải lên avatar mới',
+      [
+        {
+          text: 'Hủy bỏ',
+          onPress: () => console.log('Hủy bỏ'),
+          style: 'cancel',
+        },
+        {
+          text: 'Có',
+          onPress: async () => {
+            // Thực hiện logic xóa ở đây
+            await pickAvata()
+            // Đóng hộp thoại xác nhận
+          },
+        },
+      ],
+      { cancelable: false },
+    );
+  }
+
+  const handleLogout = async () => {
+    Alert.alert(
+      'Đăng xuất',
+      '',
+      [
+        {
+          text: 'Hủy bỏ',
+          onPress: () => console.log('Hủy bỏ'),
+          style: 'cancel',
+        },
+        {
+          text: 'Có',
+          onPress: async () => {
+            await clearAllAsyncStorage();
+            navigation.navigate(NAVIGATION_TITLE.LOGIN);
+          },
+        },
+      ],
+      { cancelable: false },
+    );
+
+  }
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor={theme.backgroundColor} />
+      <StatusBar backgroundColor={theme.color_1} />
       <ImageBackground
         source={require('../../../assets/images/paper.png')}
         resizeMode="cover">
-        <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 20 }}>
           <Image source={{ uri: `${MEDIA.SELF}?id=${userInfo?.avatarId}` }} style={styles.avata} />
           <TouchableOpacity style={styles.iconCamera}
-            onPress={() => { pickCover() }}>
+            onPress={() => { changeAvatar() }}>
             <Icon name='camera' size={15} color={'gray'}></Icon>
           </TouchableOpacity>
         </View>
-        <View style={{}}>
+        <View style={{ paddingBottom: 25, paddingTop: 5 }}>
           <Text style={styles.userName}>VƯỜN CỦA {gardenInfo?.name.toUpperCase()}</Text>
-          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 5 }}>
             <Image
               source={require('../../../assets/images/icon/ic_leaf.png')}
               style={styles.iconBio}
@@ -179,7 +181,8 @@ const Info = () => {
 
       <View style={styles.body}>
         <ScrollView style={styles.scroll}>
-          <TouchableOpacity >
+          <TouchableOpacity
+            onPress={() => navigation.navigate(NAVIGATION_TITLE.MYPROFILE, { 'user': gardenInfo })}>
             <View style={styles.fix}>
               <Image
                 source={require('../../../assets/images/icon/ic_user.png')}
@@ -207,7 +210,7 @@ const Info = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => navigation.navigate(NAVIGATION_TITLE.COMMUNITY)}>
+            onPress={() => navigation.navigate(NAVIGATION_TITLE.MYSTATUS)}>
             <View style={styles.fix}>
               <Image
                 source={require('../../../assets/images/icon/ic_status.png')}
@@ -221,7 +224,7 @@ const Info = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => navigation.navigate(NAVIGATION_TITLE.GREEN)}>
+            onPress={() => navigation.navigate(NAVIGATION_TITLE.SAVEPOST)}>
             <View style={styles.fix}>
               <Image
                 source={require('../../../assets/images/icon/ic_save.png')}
@@ -234,7 +237,26 @@ const Info = () => {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate(NAVIGATION_TITLE.FOLLOW_USER)}>
+            <View style={styles.fix}>
+              <Icon
+                name='user-plus'
+                color={theme.color_1} size={20}
+                style={{
+                  height: 25,
+                  width: 20,
+                  marginRight: 15,
+                }}
+              />
+              <Text style={styles.text}>
+                Vườn bạn theo dõi
+              </Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleLogout}>
             <View style={styles.fix}>
               <Image
                 source={require('../../../assets/images/icon/ic_logout.png')}

@@ -1,18 +1,85 @@
-import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { FlatList, Text, ToastAndroid, TouchableOpacity, View } from 'react-native';
 import { SCREEN_HEIGHT } from '../../../utils/Dimension'
 import { StatusBar } from 'expo-status-bar';
 import { Searchbar } from 'react-native-paper';
-
+import { useFocusEffect } from '@react-navigation/native';
 import st from './styles'
 import useTheme from '../../hooks/useTheme'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import APost from './post/aPost';
+import { getItemObjectAsyncStorage } from '../../../utils/asyncStorage';
+import { KEY_STORAGE } from '../../constants/storage';
+import { searchGardenAction } from '../../services/garden/actions';
+import { searchPostAction } from '../../services/post/actions';
+import { useDispatch } from 'react-redux';
+import Post from './post/post';
 
 const Database = () => {
   const styles = st();
   const theme = useTheme();
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [loading, setLoading] = useState(false)
+  const [refreshing, setRefreshing] = useState(false);
+  const [listPost, setListPost] = useState([]);
+  const dispatch = useDispatch<any>();
+  const [userInfo, setUserInfo] = useState<any>();
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await handelGetPost()
+    setRefreshing(false);
+  }, []);
+
+  let userId
+  const getUserId = async () => {
+    userId = await getItemObjectAsyncStorage(KEY_STORAGE.USER_ID);
+  }
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        await getUserInfo()
+        await handelGetPost()
+      }
+      fetchData();
+    }, []
+    ))
+
+  const getUserInfo = async () => {
+    await getUserId();
+    setLoading(true);
+    const req = new FormData();
+    req.append("userId", userId)
+    try {
+      const res = await dispatch(searchGardenAction(req));
+      console.log('garden: ', res.payload.body[0])
+      setUserInfo(res.payload.body[0]);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching user info:', err);
+      setLoading(false);
+    }
+  };
+
+  const handelGetPost = async () => {
+    setLoading(true)
+    try {
+      const res = await dispatch(searchPostAction({ 'keyword': searchQuery }));
+      if (res?.payload) {
+        console.log('status', res?.payload.body)
+        setListPost(res?.payload.body);
+      } else {
+        ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT);
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching satus info:', error);
+      ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT);
+      setLoading(false);
+    };
+
+  }
 
   return (
     <SafeAreaView>
@@ -24,30 +91,23 @@ const Database = () => {
         style={{ marginTop: 20, marginHorizontal: 15 }}
       />
       <View>
-        <View style={{ flexDirection: 'row', marginVertical: 20 }}>
-          <TouchableOpacity style={styles.tag}>
-            <Text style={styles.subtitle}>subtitle</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.tag}>
-            <Text style={styles.subtitle}>type</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.tag}>
-            <Text style={styles.subtitle}>type</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.tag}>
-            <Text style={styles.subtitle}>type</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.tag}>
-            <Text style={styles.subtitle}>type</Text>
-          </TouchableOpacity><TouchableOpacity style={styles.tag}>
-            <Text style={styles.subtitle}>type</Text>
-          </TouchableOpacity>
+        <View>
+          <Text style={styles.title}>Gợi ý</Text>
+          <FlatList
+            data={listPost}
+            renderItem={({ item }) => <APost data={item} />}
+            keyExtractor={item => item.id}
+            style={{
+              marginBottom: 50,
+            }}
+            refreshing={refreshing} // Trạng thái làm mới
+            onRefresh={onRefresh} // Hàm được gọi khi làm mới
+            onScroll={() => { onRefresh }}
+          // onEndReached={onEndReached} // Hàm được gọi khi người dùng đến cuối danh sách
+          // onEndReachedThreshold={0.1}
+          />
         </View>
-        <Text style={styles.title}>Gợi ý</Text>
-        <APost></APost>
-        <APost></APost>
-        <APost></APost>
-        <APost></APost>
+
       </View>
     </SafeAreaView>
   );

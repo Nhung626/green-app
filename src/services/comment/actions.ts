@@ -14,7 +14,7 @@ export const getCommentAction = createAsyncThunk(
 export const createCommentAction = createAsyncThunk(
     'comment/createCommentAction',
     async (data: {}) => {
-        const res = await formdata.put(COMMENT.CREATE, data)
+        const res = await formdata.post(COMMENT.CREATE, data)
         return res.data
     }
 )
@@ -30,7 +30,7 @@ export const updateCommentAction = createAsyncThunk(
 export const searchCommentAction = createAsyncThunk(
     'comment/searchCommentAction',
     async (data: {}) => {
-        const res = await httpClient.get(COMMENT.SEARCH, data)
+        const res = await formdata.post(COMMENT.SEARCH, data)
         return res.data
     }
 )
@@ -46,7 +46,7 @@ export const deleteCommentAction = createAsyncThunk(
 export const likeCommentAction = createAsyncThunk(
     'comment/likeCommentAction',
     async (data: {}) => {
-        const res = await httpClient.post(COMMENT.LIKE, data)
+        const res = await formdata.post(COMMENT.LIKE, data)
         return res.data
     }
 )
@@ -54,7 +54,7 @@ export const likeCommentAction = createAsyncThunk(
 export const unlikeCommentAction = createAsyncThunk(
     'comment/unlikeCommentAction',
     async (data: {}) => {
-        const res = await httpClient.post(COMMENT.UNLIKE, data)
+        const res = await formdata.post(COMMENT.UNLIKE, data)
         return res.data
     }
 )

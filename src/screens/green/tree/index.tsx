@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { Text, View, TouchableOpacity, FlatList, ScrollView, ToastAndroid } from 'react-native';
 import { Icon } from '@rneui/base';
 import { useNavigation } from '@react-navigation/native';
@@ -14,7 +15,7 @@ import Loading from '../../../../utils/loading/loading';
 
 
 
-const ListTree = ({ data }) => {
+const ListTree = ({ data, isShow }) => {
   const styles = st();
   const theme = useTheme();
   const navigation = useNavigation<any>();
@@ -22,45 +23,46 @@ const ListTree = ({ data }) => {
   const dispatch = useDispatch<any>();
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true)
-      try {
-        const res = await dispatch(searchTreeAction({ 'gardenId': data }));
-        if (res?.payload) {
-          setListTree(res?.payload.body);
-          console.log('list: ', listTree);
-        } else {
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        setLoading(true)
+        try {
+          const res = await dispatch(searchTreeAction({ 'gardenId': data }));
+          if (res?.payload) {
+            setListTree(res?.payload.body);
+          }
+          setLoading(false);
+        } catch (error) {
+          console.error('Error fetching garden info:', error);
           ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT);
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching garden info:', error);
-        ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT);
-        setLoading(false);
+          setLoading(false);
 
-      };
-    }
-    fetchData();
-  }, []);
+        };
+      }
+      fetchData();
+    }, []
+    ))
 
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
         data={listTree}
-        renderItem={({ item }) => <Tree data={item} />}
+        renderItem={({ item }) => <Tree data={item} isShow={isShow} />}
         keyExtractor={item => item.name}
         style={{
           marginBottom: 50,
         }}
       />
 
-      <TouchableOpacity style={styles.add}
-        onPress={() => navigation.navigate(NAVIGATION_TITLE.ADD_TREE, {'mode': 'create', 'userId': data})}
-      >
-        <Icon name='add' style={{ color: theme.color_4 }}>
-        </Icon>
-      </TouchableOpacity>
+      {(isShow) &&
+        <TouchableOpacity style={styles.add}
+          onPress={() => navigation.navigate(NAVIGATION_TITLE.ADD_TREE)}
+        >
+          <Icon name='add' style={{ color: theme.color_4 }}>
+          </Icon>
+        </TouchableOpacity>
+      }
       <Loading visiable={loading} />
 
     </SafeAreaView>

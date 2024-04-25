@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { createStatusAction, deleteStatusAction, getStatusAction, searchStatusAction, updateStatusAction } from "./actions"
+import { createStatusAction, deleteStatusAction, getStatusAction, likeStatusAction, searchStatusAction, unlikeStatusAction, updateStatusAction } from "./actions"
 
 interface ISTATUS {
     loading: boolean,
@@ -52,6 +52,47 @@ export const authSlice = createSlice({
             };
         })
         builder.addCase(searchStatusAction.rejected, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+
+
+        builder.addCase(likeStatusAction.pending, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+        builder.addCase(likeStatusAction.fulfilled, (state, action) => {
+            return {
+                ...state,
+                loading: false,
+                res: action.payload.data
+            };
+        })
+        builder.addCase(likeStatusAction.rejected, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+
+        builder.addCase(unlikeStatusAction.pending, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+        builder.addCase(unlikeStatusAction.fulfilled, (state, action) => {
+            return {
+                ...state,
+                loading: false,
+                res: action.payload.data
+            };
+        })
+        builder.addCase(unlikeStatusAction.rejected, (state) => {
             return {
                 ...state,
                 loading: true,

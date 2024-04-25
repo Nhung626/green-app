@@ -11,6 +11,18 @@ const styles = () => {
         image:{
 
         },
+        username: {
+            fontSize: 10,
+            fontWeight: '600',
+            color: theme.color_1
+        },
+        comment:{
+            fontSize: 11,
+            color: theme.color_1
+        },
+        bott:{
+
+        }
     })
     return st;
 }

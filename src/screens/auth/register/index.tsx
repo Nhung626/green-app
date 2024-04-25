@@ -5,7 +5,9 @@ import { useNavigation } from '@react-navigation/native';
 import { NAVIGATION_TITLE } from '../../../constants/navigation';
 import { validateEmail, validatePassword } from '../../../../utils/validate';
 import { useDispatch } from 'react-redux';
-import { registerActions } from '../../../services/auth/actions';
+import { loginActions, registerActions } from '../../../services/auth/actions';
+import { setItemAsyncStorage } from '../../../../utils/asyncStorage';
+import { KEY_STORAGE } from '../../../constants/storage';
 
 const Register = () => {
   const [account, setAccount] = useState({
@@ -47,19 +49,34 @@ const Register = () => {
       dispatch(registerActions({
         email: account.email,
         password: account.password,
-      })).then(res => {
-        showToast()
-        navigation.navigate(NAVIGATION_TITLE.LOGIN);
-        setAccount({
-          email: "",
-          password: "",
-          confirmPassword: ""
-        });
+      })).then(async res => {
+        if (res.payload) {
+          showToast()
+          await handleLogin();
+          navigation.navigate(NAVIGATION_TITLE.ADD_USERINFO);
+          setAccount({
+            email: "",
+            password: "",
+            confirmPassword: ""
+          });
+        }
       })
         .catch(err => ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT))
     }
   };
 
+  const handleLogin = async () => {
+    await dispatch(loginActions(account))
+      .then(async res => {
+        if (res.payload) {
+          await setItemAsyncStorage(KEY_STORAGE.SAVED_INFO, JSON.stringify(res.payload));
+          await setItemAsyncStorage(KEY_STORAGE.USER_ID, JSON.stringify(res.payload.id));
+        }
+      })
+      .catch(err => {
+        ToastAndroid.show('Xem lại thông tin đăng nhập!', ToastAndroid.SHORT)
+      })
+  };
   return (
     <KeyboardAvoidingView style={styles.container}>
       <Image

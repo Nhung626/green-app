@@ -6,63 +6,164 @@ import { Avatar } from 'react-native-paper';
 import Icon from "react-native-vector-icons/FontAwesome";
 import * as ImagePicker from 'expo-image-picker';
 import { Button } from 'react-native-paper';
+import { getItemObjectAsyncStorage } from '../../../../../utils/asyncStorage';
+import { KEY_STORAGE } from '../../../../constants/storage';
+import { useDispatch } from 'react-redux';
+import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/native";
+import { createStatusAction } from '../../../../services/status/actions';
+import Loading from '../../../../../utils/loading/loading';
+import { MEDIA } from '../../../../constants/api';
+import { searchGardenAction } from '../../../../services/garden/actions';
 
 const AddStatus = () => {
 
     const styles = st();
     const theme = useTheme();
-
-    const [image, setImage] = useState(null)
+    const [images, setImages] = useState([])
     const [content, setContent] = useState('')
+    const [loading, setLoading] = useState(false)
+    const navigation = useNavigation<any>()
+    const dispatch = useDispatch<any>();
+    const [user, setUser] = useState<any>();
+    useFocusEffect(
+        useCallback(() => {
+            getUserInfo();
+        }, [])
+    );
+    let userId
+    const getUserId = async () => {
+        userId = await getItemObjectAsyncStorage(KEY_STORAGE.USER_ID);
+    }
+    const getUserInfo = async () => {
+        await getUserId();
+        setLoading(true);
+
+        try {
+            const res = await dispatch(searchGardenAction({ userId: userId }));
+            setUser(res.payload.body[0]);
+            setLoading(false);
+        } catch (err) {
+            console.error('Error fetching user info:', err);
+            setLoading(false);
+        }
+    };
+
+    const handleSaveStatus = async () => {
+        setLoading(true)
+        await getUserId();
+        const req = new FormData();
+        images.forEach((img, index) => {
+            //@ts-ignore
+            req.append(`img`, {
+                uri: img,
+                type: 'image/png',
+                name: `image-${index}.png`,
+            });
+        });
+        req.append('userId', user.userId);
+        req.append('content', content);
+        try {
+            const res = await dispatch(createStatusAction(req));
+
+            if (res.payload) {
+                setLoading(false);
+                navigation.goBack();
+                ToastAndroid.show('Đăng bài thành công!', ToastAndroid.SHORT);
+                setContent('');
+                setImages([]);
+            } else {
+                ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT);
+                setLoading(false);
+            }
+        } catch (err) {
+            console.log('Error:', err);
+            setLoading(false);
+            ToastAndroid.show('Đã xảy ra lỗi!', ToastAndroid.SHORT);
+        }
+    };
     const pickCover = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
+            allowsMultipleSelection: true,
+            // allowsEditing: true,
             aspect: [16, 9],
             quality: 1,
         });
 
         if (!result.canceled) {
-            setImage(result.assets[0]);
-            return
+            const selectedImage = result.assets.map((asset) => asset.uri);
+            if (images.length + selectedImage.length <= 5) {
+                setImages([...images, ...selectedImage]);
+            } else {
+                ToastAndroid.show('Số lượng ảnh vượt quá giới hạn (5 ảnh).', ToastAndroid.SHORT);
+            }
         }
     };
+
+    const handleRemoveImg = (indexToRemove) => {
+        const updateImg = [...images];
+        updateImg.splice(indexToRemove, 1);
+        setImages(updateImg);
+    };
     return (
-        <View style={styles.container}>
-            <View style={{ flexDirection: 'row', alignItems: 'center'}}>
-                <Avatar.Image size={30} source={require('../../../../../assets/images/cover.png')} />
-                <Text style={styles.username}>Usename</Text>
+        <SafeAreaView style={{ flex: 1 }}>
+            <StatusBar backgroundColor={theme.color_2} />
+            <View style={styles.header}>
+                <TouchableOpacity
+                    onPress={() => navigation.goBack()}
+                >
+                    <Icon name="remove" style={{ marginRight: 0, marginTop: 5 }} color={theme.color_1} size={25}></Icon>
+                </TouchableOpacity>
+                <Text style={styles.headerText}>Tạo bài đăng mới</Text>
             </View>
-            <View style={{ marginTop: 10, marginHorizontal: 5, }}>
-                <View style={styles.content}>
-                    <TextInput
-                        multiline={true}
-                        numberOfLines={1}
-                        textAlignVertical="top"
-                        cursorColor={'gray'}
-                        placeholder='Chia sẻ vô đây nhé.'
-                        value={content}
-                        onChangeText={(text) => setContent(text)}
-                    ></TextInput>
-                    {image &&
-                        <Image source={{ uri: image.uri }} style={styles.image} />
-                    }
-                    <TouchableOpacity onPress={pickCover} style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 5 }} >
-                        <Icon name='camera' color={theme.color_1} size={20}></Icon>
-                    </TouchableOpacity>
+            <View style={styles.container}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Avatar.Image size={30} source={{ uri: `${MEDIA.SELF}?id=${user?.userInfo.avatarId}` }} />
+                    <Text style={styles.username}>{user?.name}</Text>
                 </View>
-                {(image || content) &&
-                    <View style={styles.viewButton}>
-                        <TouchableOpacity onPress={pickCover} style={styles.button}>
-                            <Text>Hủy</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={pickCover} style={styles.button}>
-                            <Text>Đăng</Text>
+                <View style={{ marginTop: 10, marginHorizontal: 5, }}>
+                    <View style={styles.content}>
+                        <TextInput
+                            multiline={true}
+                            numberOfLines={1}
+                            textAlignVertical="top"
+                            cursorColor={'gray'}
+                            placeholder='Chia sẻ vô đây nhé.'
+                            value={content}
+                            onChangeText={(text) => setContent(text)}
+                        ></TextInput>
+                        <ScrollView
+                            horizontal
+                            // pagingEnabled
+                            contentContainerStyle={{ alignItems: 'center' }}>
+                            {images.map((image, index) => (
+                                <View key={index}>
+                                    < Image source={{ uri: image }} style={styles.image} />
+                                    <TouchableOpacity onPress={() => handleRemoveImg(index)} style={{ position: 'absolute', top: 20, right: 25 }}>
+                                        <Icon name="close" size={20} />
+                                    </TouchableOpacity>
+                                </View>
+                            )
+                            )}
+                        </ScrollView>
+                        <TouchableOpacity onPress={pickCover} style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 5 }} >
+                            <Icon name='camera' color={theme.color_1} size={20}></Icon>
                         </TouchableOpacity>
                     </View>
-                }
-            </View>
-        </View >
+                    {(images[0] || content) &&
+                        <View style={styles.viewButton}>
+                            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.button}>
+                                <Text>Hủy</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={handleSaveStatus} style={styles.button}>
+                                <Text>Đăng</Text>
+                            </TouchableOpacity>
+                        </View>
+                    }
+                </View>
+                <Loading visiable={loading} />
+            </View >
+        </SafeAreaView>
     )
 }
 export default AddStatus;

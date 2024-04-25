@@ -19,13 +19,18 @@ const styles = () => {
       height: '95%',
     },
     boxStyle: {
-      margin: 10,
-      flexDirection: "row"
+      paddingVertical: 10,
+      paddingHorizontal: 10,
+      flexDirection: "row",
+      borderColor: theme.color_1,
+      borderWidth: 0.8,
+      marginBottom: 12,
+      marginHorizontal: 12,
+      borderRadius: 10
     },
     boxText: {
-      flexDirection: 'row',
-      columnGap: 10,
-      alignItems: 'center',
+      marginBottom: 4,
+      width: 220,
     },
     textInfo: {
       color: theme.text_3,
@@ -76,6 +81,7 @@ const styles = () => {
     },
     header: {
       flexDirection: 'row',
+      justifyContent: 'space-between',
       fontSize: 25,
       fontWeight: "600",
       color: theme.text_3,
@@ -141,9 +147,18 @@ const styles = () => {
     add: {
       position: 'absolute',
       right: 20,
-      bottom: 185,
+      bottom: 20,
       padding: 10,
       borderRadius: 50,
+      backgroundColor: theme.color_2,
+    },
+    plus: {
+      position: 'absolute',
+      right: 20,
+      bottom: 0,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      borderRadius: 100,
       backgroundColor: theme.color_2,
     },
 

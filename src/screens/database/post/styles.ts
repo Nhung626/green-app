@@ -66,7 +66,7 @@ const styles = () => {
         },
 
         boxRect: {
-            marginTop: 20,
+            marginVertical: 20,
             borderTopWidth: 0.5,
             paddingTop: 20,
             borderColor: theme.color_1,

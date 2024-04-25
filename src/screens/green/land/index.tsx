@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { Text, TouchableOpacity, View, FlatList, ScrollView, ToastAndroid } from 'react-native';
 import st from './styles'
 import Land from './land';
@@ -11,7 +12,7 @@ import { useDispatch } from 'react-redux';
 import { searchLandAction } from '../../../services/land/actions';
 import Loading from '../../../../utils/loading/loading';
 
-const ListLand = ({ data }) => {
+const ListLand = ({ data, isShow }) => {
   const styles = st();
   const theme = useTheme();
   const navigation = useNavigation<any>();
@@ -19,47 +20,42 @@ const ListLand = ({ data }) => {
   const dispatch = useDispatch<any>();
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true)
-      try {
-        const res = await dispatch(searchLandAction({ 'gardenId': data }));
-        if (res.payload) {
-          setListLand(res.payload.body);
-        } else {
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        setLoading(true)
+        try {
+          const res = await dispatch(searchLandAction({ userId: data }));
+          if (res.payload) {
+            setListLand(res.payload.body);
+          }
+          setLoading(false);
+        } catch (error) {
+          console.error('Error fetching garden info:', error);
           ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT);
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching garden info:', error);
-        ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT);
-        setLoading(false);
+          setLoading(false);
 
-      };
-    }
-    fetchData();
-  }, []);
+        };
+      }
+      fetchData();
+    }, [])
+  );
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
         data={listLand}
-        renderItem={({ item }) => <Land data={item}/>}
+        renderItem={({ item }) => <Land data={item} isShow={isShow} />}
         keyExtractor={item => item.id}
         style={styles.list}
       />
-      <TouchableOpacity style={{
-        position: 'absolute',
-        right: 20,
-        bottom: 20,
-        padding: 10,
-        borderRadius: 50,
-        backgroundColor: theme.color_2,
-      }}
-        onPress={() => navigation.navigate(NAVIGATION_TITLE.ADD_LAND)}
-      >
-        <Icon name='add' style={{ color: theme.color_4 }}>
-        </Icon>
-      </TouchableOpacity>
+      {(isShow) &&
+        <TouchableOpacity style={styles.add}
+          onPress={() => navigation.navigate(NAVIGATION_TITLE.ADD_LAND)}
+        >
+          <Icon name='add' style={{ color: theme.color_4 }}>
+          </Icon>
+        </TouchableOpacity>
+      }
       <Loading visiable={loading} />
     </SafeAreaView>
   );

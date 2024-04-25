@@ -14,7 +14,7 @@ export const getInfoUserAction = createAsyncThunk(
 export const createInfoUserAction = createAsyncThunk(
     'user/createInfoUserAction',
     async (data: {}) => {
-        const res = await formdata.put(USER_INFO.CREATE, data)
+        const res = await formdata.post(USER_INFO.CREATE, data)
         return res.data
     }
 )
@@ -22,7 +22,7 @@ export const createInfoUserAction = createAsyncThunk(
 export const updateInfoUserAction = createAsyncThunk(
     'user/updateInfoUserAction',
     async (data: {}) => {
-        const res = await formdata.put(USER_INFO.UPDATE, data)
+        const res = await formdata.post(USER_INFO.UPDATE, data)
         return res.data
     }
 )
@@ -30,7 +30,7 @@ export const updateInfoUserAction = createAsyncThunk(
 export const updateAatarAction = createAsyncThunk(
     'user/updateAatarAction',
     async (data: {}) => {
-        const res = await formdata.put(USER_INFO.UPDATE_AVATAR, data)
+        const res = await formdata.post(USER_INFO.UPDATE_AVATAR, data)
         return res.data
     }
 )
@@ -44,10 +44,20 @@ export const searchInfoUserAction = createAsyncThunk(
     }
 )
 
-// export const resetPasswordAction = createAsyncThunk(
-//     'user/resetPasswordAction',
-//     async (data: {}) => {
-//         const res = await httpClient.put(USER_INFO.RESET_PASSWORD, data)
-//         return res.data
-//     }
-// )
+export const followAction = createAsyncThunk(
+    'status/followAction',
+    async (data: {}) => {
+        const res = await formdata.post(USER_INFO.FOLLOW, data)
+        console.log(data)
+        return res.data
+    }
+)
+
+export const unfollowAction = createAsyncThunk(
+    'status/unfollowAction',
+    async (data: {}) => {
+        const res = await formdata.post(USER_INFO.UNFOLLOW, data)
+        return res.data
+    }
+)
+

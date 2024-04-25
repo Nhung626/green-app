@@ -14,7 +14,7 @@ export const getLandAction = createAsyncThunk(
 export const createLandAction = createAsyncThunk(
     'land/createLandAction',
     async (data: {}) => {
-        const res = await formdata.put(LAND.CREATE, data)
+        const res = await formdata.post(LAND.CREATE, data)
         return res.data
     }
 )
@@ -22,7 +22,7 @@ export const createLandAction = createAsyncThunk(
 export const updateLandAction = createAsyncThunk(
     'land/updateLandAction',
     async (data: {}) => {
-        const res = await formdata.put(LAND.UPDATE, data)
+        const res = await formdata.post(LAND.UPDATE, data)
         return res.data
     }
 )
@@ -30,7 +30,7 @@ export const updateLandAction = createAsyncThunk(
 export const searchLandAction = createAsyncThunk(
     'land/searchLandAction',
     async (data: {}) => {
-        const res = await httpClient.get(LAND.SEARCH, data)
+        const res = await formdata.post(LAND.SEARCH, data)
         return res.data
     }
 )

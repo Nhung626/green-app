@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NAVIGATION_TITLE } from '../../../constants/navigation';
 import { useDispatch } from 'react-redux';
 import { loginActions } from '../../../services/auth/actions';
-import { getItemObjectAsyncStorage, setItemAsyncStorage } from '../../../../utils/asyncStorage';
+import { clearAllAsyncStorage, getItemObjectAsyncStorage, setItemAsyncStorage } from '../../../../utils/asyncStorage';
 import { KEY_STORAGE } from '../../../constants/storage';
 import Loading from '../../../../utils/loading/loading';
 import Toast from '../../../../utils/toast';
@@ -26,23 +26,25 @@ const Login = () => {
         }
     }
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         setLoading(true)
-        dispatch(loginActions(account))
-            .then(res => {
-                setLoading(false)
+        await dispatch(loginActions(account))
+            .then(async res => {
                 if (res.payload) {
-                    setItemAsyncStorage(KEY_STORAGE.SAVED_INFO, JSON.stringify(res.payload));
-                    setItemAsyncStorage(KEY_STORAGE.USER_ID, JSON.stringify(res.payload.id));
-                    navigation.navigate(NAVIGATION_TITLE.TAB, { screen: NAVIGATION_TITLE.GREEN })
+                    await clearAllAsyncStorage();
+                    await setItemAsyncStorage(KEY_STORAGE.SAVED_INFO, JSON.stringify(res?.payload));
+                    await setItemAsyncStorage(KEY_STORAGE.USER_ID, JSON.stringify(res?.payload.id));
                     setAccount({
                         email: '',
                         password: '',
                     });
                     console.log(res.payload)
-                    return(<Toast description='Đăng nhập thành công' time={3} />)
+                    navigation.navigate(NAVIGATION_TITLE.TAB, { screen: NAVIGATION_TITLE.GREEN })
+                    setLoading(false)
+                    return (<Toast description='Đăng nhập thành công' time={3} />)
                 } else {
                     ToastAndroid.show('Xem lại thông tin đăng nhập!', ToastAndroid.SHORT)
+                    setLoading(false)
                 }
             })
             .catch(err => {
@@ -79,7 +81,7 @@ const Login = () => {
                 />
             </View>
             <TouchableOpacity
-                onPress={handleLogin} 
+                onPress={handleLogin}
                 style={styles.formBtn}>
                 <Text style={styles.textBtn}>Đăng nhập</Text>
             </TouchableOpacity>

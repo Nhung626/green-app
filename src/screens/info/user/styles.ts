@@ -1,24 +1,35 @@
 
 import { StyleSheet } from "react-native";
-import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../../utils/Dimension";
-import useTheme from "../../hooks/useTheme";
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "../../../../utils/Dimension";
+import useTheme from "../../../hooks/useTheme";
 
 const styles = () => {
     const theme = useTheme();
     const st = StyleSheet.create({
         container: {
             backgroundColor: theme.backgroundColor,
-            minHeight: SCREEN_HEIGHT,
+            // minHeight: SCREEN_HEIGHT,
             flex: 1,
         },
         header: {
             flexDirection: 'row',
+            justifyContent:'space-between',
+            paddingHorizontal: 15,
+        },
+        tabBar: {
+            color: theme.text_3,
+            fontSize: 18,
+            fontWeight: '600',
         },
         cover: {
             resizeMode: "cover",
             width: SCREEN_WIDTH,
             height: 200,
             overflow: 'hidden',
+        },
+        headerText: {
+            color: theme.color_1,
+            fontSize: 24,
         },
         avata: {
             borderWidth: 1,
@@ -59,11 +70,7 @@ const styles = () => {
             marginLeft: 25,
         },
         body: {
-            flex: 1,
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
-            backgroundColor: theme.backgroundColor_2,
+           
         },
         scroll: {
             marginTop: 10,

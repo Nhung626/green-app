@@ -9,7 +9,7 @@ const styles = () => {
     container: {
       backgroundColor: theme.backgroundColor,
     },
-    
+
     boxText: {
       flexDirection: 'row',
       columnGap: 10,
@@ -21,6 +21,11 @@ const styles = () => {
       textAlign: 'left'
     },
 
+    headerText: {
+      color: theme.color_1,
+      fontSize: 24,
+      fontWeight: '600',
+    },
 
     //add tree
     backgroundStyle: {
@@ -28,7 +33,7 @@ const styles = () => {
 
     },
     body: {
-      marginTop: 50,
+      marginTop: 20,
       backgroundColor: 'white',
       paddingHorizontal: 10,
       paddingTop: 10,
@@ -69,6 +74,14 @@ const styles = () => {
       paddingHorizontal: 15,
       paddingVertical: 20,
       textAlign: 'center',
+    },
+
+    header1: {
+      justifyContent: 'flex-end',
+      // color: theme.text_3,
+      paddingHorizontal: 15,
+      paddingVertical: 20,
+      flexDirection: 'row'
     },
     name: {
       color: theme.text_3,
@@ -143,15 +156,14 @@ const styles = () => {
       marginHorizontal: 10,
       paddingBottom: 10,
     },
-    headerList:{
+    headerList: {
       flexDirection: 'row',
       borderBottomWidth: 0.6,
       borderBottomColor: theme.color_2,
       marginTop: 10,
-      marginHorizontal:20,
-      paddingBottom: 2,
+      marginHorizontal: 20,
     },
-    list:{
+    list: {
       flexDirection: 'row'
     },
     date: {
@@ -169,8 +181,32 @@ const styles = () => {
       overflow: 'hidden',
       borderRadius: 20,
       marginTop: 10,
-      marginLeft:15,
+      marginLeft: 15,
       width: 120, // Cho Android
+    },
+    imgReviewContainer: {
+      margin: 5,
+    },
+    imgReview: {
+      width: 160,
+      height: 200,
+      borderRadius: 10,
+    },
+    imageContainer1: {
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.color_1,
+      margin: 5,
+      paddingHorizontal: 5,
+      width: '40%'
+    },
+    imageContainer2: {
+      width: '40%',
+      margin: 5,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.color_1,
+      paddingVertical: 10,
     },
   })
   return st

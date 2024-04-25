@@ -14,7 +14,7 @@ export const getDiaryAction = createAsyncThunk(
 export const createDiaryAction = createAsyncThunk(
     'diary/createDiaryAction',
     async (data: {}) => {
-        const res = await formdata.put(DIARY.CREATE, data)
+        const res = await formdata.post(DIARY.CREATE, data)
         return res.data
     }
 )
@@ -22,7 +22,7 @@ export const createDiaryAction = createAsyncThunk(
 export const updateDiaryAction = createAsyncThunk(
     'diary/updateDiaryAction',
     async (data: {}) => {
-        const res = await formdata.put(DIARY.UPDATE, data)
+        const res = await formdata.post(DIARY.UPDATE, data)
         return res.data
     }
 )

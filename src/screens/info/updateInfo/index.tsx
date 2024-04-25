@@ -6,110 +6,87 @@ import {
     ScrollView,
     TouchableOpacity,
     Image,
-    ToastAndroid
+    ToastAndroid,
+    StatusBar
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { CheckBox } from '@rneui/themed';
-import { useNavigation, useIsFocused } from "@react-navigation/native";
 import moment from "moment";
 import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from "react-native-safe-area-context";
 import st from './styles'
 import useTheme from '../../../hooks/useTheme'
+import { useNavigation, useIsFocused, useRoute } from "@react-navigation/native";
 import { NAVIGATION_TITLE } from "../../../constants/navigation";
 import { getItemObjectAsyncStorage, setItemAsyncStorage } from '../../../../utils/asyncStorage';
 import { KEY_STORAGE } from "../../../constants/storage";
 import { createInfoUserAction, getInfoUserAction, updateInfoUserAction } from "../../../services/user/actions"
 import { createGardenAction, getGardenAction, updateGardenAction } from "../../../services/garden/actions"
 import { useDispatch } from 'react-redux'
+import { MEDIA } from "../../../constants/api";
+import SelectDropdown from "react-native-select-dropdown";
 
-const UpdateInfo = ({ mode, data }) => {
+const UpdateInfo = () => {
     const styles = st();
     const theme = useTheme();
     const dispatch = useDispatch<any>()
     const isFocused = useIsFocused()
-    const [dateOfBirth, setDateOfBirth] = useState(new Date());
+    const route = useRoute<any>();
+    const user = route.params.data;
+    const [dateOfBirth, setDateOfBirth] = useState(new Date(user.userInfo.dateOfBirth));
     const [viewDateOfBirth, setViewDateOfBirth] = useState(false)
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const [avatar, setAvatar] = useState(null);
-    const [cover, setCover] = useState(null);
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
-    const [phone, setPhone] = useState('');
-    const [address, setAddress] = useState('');
-    const [gender, setGender] = useState('');
-    const [isGenderP, setIsGenderP] = useState(false)
-    const [isDateOfBirthP, setIsDateOfBirthP] = useState(false)
-    const [isPhoneP, setIsPhoneP] = useState(false)
-    const [isAddressP, setIsAddressP] = useState(false)
+    const [avatar, setAvatar] = useState(`${MEDIA.SELF}?id=${user?.userInfo.avatarId}`);
+    const [cover, setCover] = useState(`${MEDIA.SELF}?id=${user?.coverId}`);
+    const [name, setName] = useState(user.name);
+    const [description, setDescription] = useState(user.description);
+    const [phone, setPhone] = useState(user.userInfo.phone);
+    const [address, setAddress] = useState(user.userInfo.address);
+    const [gender, setGender] = useState(user.userInfo.gender);
+    const [isGenderP, setIsGenderP] = useState(user.userInfo.isGenderP)
+    const [isDateOfBirthP, setIsDateOfBirthP] = useState(user.userInfo.isDateOfBirthP)
+    const [isPhoneP, setIsPhoneP] = useState(user.userInfo.isPhoneP)
+    const [isAddressP, setIsAddressP] = useState(user.userInfo.isAddressP)
     const [isLoading, setLoading] = useState(false)
     const navigation = useNavigation<any>()
-
-    let userId
-    const getUserId = async () => {
-        userId = await getItemObjectAsyncStorage(KEY_STORAGE.USER_ID);
-    }
-    if (mode === 'update') {
-        useEffect(() => {
-            getUserInfo()
-        }, [isFocused])
-    }
-    const getUserInfo = async () => {
-        getUserId()
-        setLoading(true);
-        try {
-            const userInfoResponse = await dispatch(getInfoUserAction(userId));
-            const gardenInfoResponse = await dispatch(getGardenAction(userId));
-            setLoading(false);
-            const userInfo = userInfoResponse.payload;
-            const gardenInfo = gardenInfoResponse.payload;
-
-            setAvatar(userInfo.avatarId);
-            setGender(userInfo.gender);
-            setIsGenderP(userInfo.isGenderP);
-            setAddress(userInfo.address);
-            setDateOfBirth(userInfo.dateOfBirth);
-            setIsDateOfBirthP(userInfo.isAddressP);
-            setPhone(userInfo.phone);
-            setIsPhoneP(userInfo.isPhoneP);
-
-            setCover(gardenInfo.coverId);
-            setName(gardenInfo.name);
-            setDescription(gardenInfo.description);
-        } catch (userInfoError) {
-            console.error('Error fetching user info:', userInfoError);
-            setLoading(false);
-        }
-    };
+    const listGender=[
+        {id:1, name: 'Nam'},
+        {id:2, name: 'Nữ'},
+        {id:3, name: 'Khác'},
+    ]
 
 
     const getInfoData = async () => {
-        getUserId();
         const userInfo = new FormData()
         const gardenInfo = new FormData()
         if (avatar) {
-            // Tải hình ảnh và chuyển đổi thành Blob
-            const response = await fetch(avatar.uri);
-            const blob = await response.blob();
-            // Thêm Blob vào FormData
-            userInfo.append('avatar', blob, 'avatar');
+            //@ts-ignore
+            userInfo.append(`avatar`, {
+                uri: avatar,
+                type: 'image/png',
+                name: `avatar.png`,
+            });
         }
         if (cover) {
-            // Tải hình ảnh và chuyển đổi thành Blob
-            const response = await fetch(cover.uri);
-            const blob = await response.blob();
-            // Thêm Blob vào FormData
-            gardenInfo.append('cover', blob, 'cover');
+            //@ts-ignore
+            gardenInfo.append(`cover`, {
+                uri: cover,
+                type: 'image/png',
+                name: `avatar.png`,
+            });
         }
 
-        userInfo.append('userId', userId);
-        userInfo.append('dateOfBirth', dateOfBirth.toISOString());
-        userInfo.append('isDateOfBirthP', '${isDateOfBirthP}');
+        userInfo.append('userId', user?.userId);
+        userInfo.append('dateOfBirth', moment(dateOfBirth).format('YYYY-MM-DD'));
+        userInfo.append('isDateOfBirthP', `true`);
+        userInfo.append('gender', gender);
         userInfo.append('address', address);
-        userInfo.append('isAddressP', '${isAddressP}');
+        userInfo.append('isAddressP', `true`);
         userInfo.append('phone', phone);
-        userInfo.append('isPhoneP', '${isPhoneP}');
+        userInfo.append('isPhoneP', `true`);
+        gardenInfo.append('id', user.id);
+        gardenInfo.append('userId', user.userId);
         gardenInfo.append('name', name);
         gardenInfo.append('description', description);
 
@@ -121,31 +98,16 @@ const UpdateInfo = ({ mode, data }) => {
         console.log('formdata', userInfo)
         setLoading(true)
         try {
-            let res
-            if (mode === 'create') {
-                // Xử lý logic để tạo mới
-                res = await Promise.all([
-                    dispatch(createInfoUserAction(userInfo)),
-                    dispatch(createGardenAction(gardenInfo))
-                ]);
-                console.log('Creating:', res.payload);
-            } else if (mode === 'update') {
-                // Xử lý logic để cập nhật
-                res = await Promise.all([
-                    dispatch(updateInfoUserAction(userInfo)),
-                    dispatch(updateGardenAction(gardenInfo))
-                ]);
-                console.log('Updating:', res.payload);
-            }
+            const res = await Promise.all([
+                dispatch(updateInfoUserAction(userInfo)),
+                dispatch(updateGardenAction(gardenInfo))
+            ]);
 
             if (res.every(result => result?.payload)) {
                 setLoading(false);
                 ToastAndroid.show('Cập nhật thành công!', ToastAndroid.SHORT);
-                if (mode === 'create') {
-                    navigation.navigate(NAVIGATION_TITLE.GREEN);
-                } else if (mode === 'update') {
-                    navigation.goBack();
-                }
+
+                navigation.goBack();
             } else {
                 ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT);
                 setLoading(false);
@@ -162,12 +124,12 @@ const UpdateInfo = ({ mode, data }) => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
-            aspect: [4, 3],
+            aspect: [5, 5],
             quality: 1,
         });
 
         if (!result.canceled) {
-            setAvatar(result.assets[0]);
+            setAvatar(result.assets[0].uri);
             return
         }
     };
@@ -180,18 +142,44 @@ const UpdateInfo = ({ mode, data }) => {
         });
 
         if (!result.canceled) {
-            setCover(result.assets[0]);
+            setCover(result.assets[0].uri);
             return
         }
     };
 
+    const renderItem = (item, index, isSelected) => {
+        return (
+            <View style={{ ...styles.dropdownItemStyle, ...(isSelected && { backgroundColor: '#D2D9DF' }) }}>
+                <Text style={styles.dropdownItemTxtStyle}>{item.name}</Text>
+            </View>
+        );
+    }
+
+    const renderButton = (selectedItem, isOpened) => {
+        return (
+            <View style={styles.dropdownButtonStyle}>
+                <Text style={styles.dropdownButtonTxtStyle}>
+                    {(selectedItem && selectedItem.name) || `${gender}`}
+                </Text>
+            </View>
+        );
+    }
     return (
         <SafeAreaView style={{ flex: 1 }}>
+            <StatusBar backgroundColor={theme.color_2} />
+            <View style={styles.header1}>
+                <TouchableOpacity
+                    onPress={() => navigation.goBack()}
+                >
+                    <Icon name="remove" style={{ marginRight: 0, marginTop: 5 }} color={theme.color_1} size={25}></Icon>
+                </TouchableOpacity>
+                <Text style={styles.headerText}>Cập nhật thông tin</Text>
+            </View>
             <ScrollView >
                 <View style={{}}>
                     <TouchableOpacity onPress={() => pickCover()} style={{}}>
                         {cover ? (
-                            <Image source={{ uri: cover.uri }} style={styles.imgCover} />
+                            <Image source={{ uri: cover }} style={styles.imgCover} />
                         ) : (
                             <Image style={styles.imgCover}
                                 source={require("../../../../assets/images/cover.png")}
@@ -200,10 +188,10 @@ const UpdateInfo = ({ mode, data }) => {
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => pickAvata()} style={styles.avata}>
                         {avatar ? (
-                            <Image source={{ uri: avatar.uri }} style={styles.imgAvt} />
+                            <Image source={{ uri: avatar }} style={styles.imgAvt} />
                         ) : (
                             <Image style={styles.imgAvt}
-                                source={require("../../../../assets/images/ava.png")}
+                                source={require("../../../../assets/images/avatar.png")}
                             />
                         )}
                     </TouchableOpacity>
@@ -221,20 +209,7 @@ const UpdateInfo = ({ mode, data }) => {
                             onChangeText={(text) => setName(text)}
                             value={name}
                         />
-                        <View style={{ flexDirection: 'row', alignContent: 'flex-end' }}>
-                            {/* <Text style={styles.title}>Hiển thị tên sẽ là: Vườn của </Text> */}
-                            <Text style={styles.name}>
-                                {name ? (
-                                    <>
-                                        <Text style={styles.name}>{name}</Text>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Text style={styles.name}>...</Text>
-                                    </>
-                                )}
-                            </Text>
-                        </View>
+                        
                         <View style={{}}>
                             <Text style={styles.text}> Giới thiệu</Text>
                             <TextInput
@@ -295,12 +270,15 @@ const UpdateInfo = ({ mode, data }) => {
                         />
                         <View style={{}}>
                             <Text style={styles.text}>Giới tính</Text>
-                            <TextInput
-                                placeholder="Giới tính"
-                                style={styles.inputBox}
-                                placeholderTextColor="grey"
-                                onChangeText={(text) => setGender(text)}
-                                value={gender}
+                            <SelectDropdown
+                                data={listGender}
+                                onSelect={(selectedItem, index) => {
+                                    setGender(selectedItem.name)
+                                }}
+                                renderButton={renderButton}
+                                renderItem={renderItem}
+                                showsVerticalScrollIndicator={false}
+                                dropdownStyle={styles.dropdownMenuStyle}
                             />
                             <CheckBox
                                 checked={isGenderP}

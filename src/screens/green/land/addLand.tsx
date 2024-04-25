@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     Image,
     ToastAndroid,
+    StatusBar,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from 'expo-image-picker';
@@ -14,10 +15,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import st from './styles'
 import useTheme from '../../../hooks/useTheme'
 import { useDispatch } from "react-redux";
+import Icon from "react-native-vector-icons/FontAwesome";
 import { createLandAction, updateLandAction } from "../../../services/land/actions";
 import { NAVIGATION_TITLE } from "../../../constants/navigation";
+import Loading from "../../../../utils/loading/loading";
+import { getItemObjectAsyncStorage } from "../../../../utils/asyncStorage";
+import { KEY_STORAGE } from "../../../constants/storage";
 
-const AddLand = ({ mode, data }) => {
+const AddLand = () => {
     const theme = useTheme();
     const styles = st();
     const [image, setImage] = useState(null);
@@ -28,44 +33,33 @@ const AddLand = ({ mode, data }) => {
     const [loading, setLoading] = useState(false)
     const dispatch = useDispatch<any>();
 
+    const getUserId = async () => {
+        return await getItemObjectAsyncStorage(KEY_STORAGE.USER_ID);
+    }
     const handleSaveLand = async () => {
         setLoading(true)
+        const userId = await getUserId();
         const req = new FormData();
         if (image) {
-            // Tải hình ảnh và chuyển đổi thành Blob
-            const response = await fetch(image.uri);
-            const blob = await response.blob();
-            // Thêm Blob vào FormData
-            req.append('img', blob, 'img');
+            // @ts-ignore
+            req.append('img', { uri: image.uri, name: 'image.jpg', type: 'image/jpeg' });
         }
-        req.append('userId', data);
+        req.append('userId', userId);
         req.append('name', name);
         req.append('area', area);
         req.append('address', address);
         try {
-            let res
-            if (mode === 'create') {
-                // Xử lý logic để tạo mới
-                res = dispatch(createLandAction(req));
-            } else if (mode === 'update') {
-                // Xử lý logic để cập nhật
-                res = await dispatch(updateLandAction(req));
-            }
-
+            const res = await dispatch(createLandAction(req));
+        
             if (res.payload) {
                 setLoading(false);
-                ToastAndroid.show('Cập nhật thành công!', ToastAndroid.SHORT);
+                ToastAndroid.show('Thêm thành công!', ToastAndroid.SHORT);
                 navigation.goBack();
-                // if (mode === 'create') {
-                //     navigation.navigate(NAVIGATION_TITLE.GREEN);
-                // } else if (mode === 'update') {
-                //     navigation.goBack();
-                // }
+
             } else {
                 ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT);
                 setLoading(false);
             }
-            console.log(res, 'update user');
         } catch (err) {
             console.log('Error:', err);
             setLoading(false);
@@ -89,6 +83,15 @@ const AddLand = ({ mode, data }) => {
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
+            <StatusBar backgroundColor={theme.color_2} />
+            <View style={styles.header}>
+                <TouchableOpacity
+                    onPress={() => navigation.goBack()}
+                >
+                    <Icon name="remove" style={{ marginRight: 0, marginTop: 5 }} color={theme.color_1} size={25}></Icon>
+                </TouchableOpacity>
+                <Text style={styles.headerText}>Tạo mới</Text>
+            </View>
             <ScrollView >
                 <View style={{}}>
                     <TouchableOpacity onPress={() => pickImage()} style={{}}>
@@ -126,19 +129,7 @@ const AddLand = ({ mode, data }) => {
                                 onChangeText={(text) => setArea(text)}
                                 value={area}
                             />
-                            <Text style={styles.text}>m2</Text>
-
-
-                            {/* <Text style={styles.text}>Chiều rộng:</Text>
-                            <TextInput
-                                placeholder="_______"
-                                style={styles.inputBox1}
-                                placeholderTextColor={theme.color_1}
-                                cursorColor='gray'
-                                onChangeText={handleChangeInfo('description')}
-                                value={info.width}
-                            />
-                            <Text style={styles.text}>m</Text> */}
+                            <Text style={styles.text}>m²</Text>
 
                         </View>
 
@@ -166,8 +157,8 @@ const AddLand = ({ mode, data }) => {
                     </View>
 
                 </View>
-
             </ScrollView>
+            <Loading visiable={loading} />
         </SafeAreaView >
     );
 }

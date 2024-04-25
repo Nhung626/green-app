@@ -14,19 +14,29 @@ const styles = () => {
             borderWidth: 0.6,
             marginHorizontal: 20,
         },
+        header_save: {
+            flexDirection: 'row',
+            justifyContent:'space-between',
+            padding: 15,
+        },
         title: {
             color: theme.color_1,
             fontSize: 25,
             marginLeft: 15,
             marginBottom: 10,
+            marginTop: 10,
             fontWeight: '600',
         },
         tag: {
             borderRadius: 20,
             paddingVertical: 5,
             paddingHorizontal: 10,
-            backgroundColor: theme.color_2, 
+            backgroundColor: theme.color_2,
             margin: 3,
+        },
+        headerText: {
+            color: theme.color_1,
+            fontSize: 24,
         },
         subtitle: {
             color: theme.color_1,

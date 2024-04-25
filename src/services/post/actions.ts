@@ -46,7 +46,7 @@ export const deletePostAction = createAsyncThunk(
 export const likePostAction = createAsyncThunk(
     'post/likePostAction',
     async (data: {}) => {
-        const res = await httpClient.post(POST.LIKE, data)
+        const res = await formdata.post(POST.LIKE, data)
         return res.data
     }
 )
@@ -54,7 +54,31 @@ export const likePostAction = createAsyncThunk(
 export const unlikePostAction = createAsyncThunk(
     'post/unlikePostAction',
     async (data: {}) => {
-        const res = await httpClient.post(POST.UNLIKE, data)
+        const res = await formdata.post(POST.UNLIKE, data)
+        return res.data
+    }
+)
+
+export const savePostAction = createAsyncThunk(
+    'post/savePostAction',
+    async (data: {}) => {
+        const res = await formdata.post(POST.SAVE, data)
+        return res.data
+    }
+)
+
+export const unsavePostAction = createAsyncThunk(
+    'post/unsavePostAction',
+    async (data: {}) => {
+        const res = await formdata.post(POST.UNSAVE, data)
+        return res.data
+    }
+)
+
+export const getAllSaveAction = createAsyncThunk(
+    'post/unsavePostAction',
+    async () => {
+        const res = await httpClient.get(POST.GETALLSAVE)
         return res.data
     }
 )

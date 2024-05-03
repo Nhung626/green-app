@@ -56,5 +56,65 @@ export const authSlice = createSlice({
                 loading: true,
             };
         })
+
+        builder.addCase(createDiaryAction.pending, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+        builder.addCase(createDiaryAction.fulfilled, (state, action) => {
+            return {
+                ...state,
+                loading: false,
+                res: action.payload.data
+            };
+        })
+        builder.addCase(createDiaryAction.rejected, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+
+        builder.addCase(updateDiaryAction.pending, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+        builder.addCase(updateDiaryAction.fulfilled, (state, action) => {
+            return {
+                ...state,
+                loading: false,
+                res: action.payload.data
+            };
+        })
+        builder.addCase(updateDiaryAction.rejected, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+
+        builder.addCase(deleteDiaryAction.pending, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+        builder.addCase(deleteDiaryAction.fulfilled, (state, action) => {
+            return {
+                ...state,
+                loading: false,
+                res: action.payload.data
+            };
+        })
+        builder.addCase(deleteDiaryAction.rejected, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
     }
 })

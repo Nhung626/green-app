@@ -52,7 +52,7 @@ export default function ALand() {
     );
 
     return (
-        <SafeAreaView style={{ backgroundColor: "#F0f0f0", flex: 1}}>
+        <SafeAreaView style={{ backgroundColor: "#F0f0f0", flex: 1 }}>
             <StatusBar backgroundColor={theme.color_2} />
             <View style={styles.header}>
                 <TouchableOpacity
@@ -107,18 +107,21 @@ export default function ALand() {
                                     <Text style={styles.textBox}>Địa chỉ: {land.address} </Text>
                                 </View>
 
-                                <View style={{ padding: 8, paddingRight: 20 }}>
+                                {/* <View style={{ padding: 8, paddingRight: 20 }}>
                                     <Text
                                         style={{ textAlign: 'right', fontWeight: "400", fontSize: 16 }}>
                                         Tổng:  cây</Text>
-                                </View>
+                                </View> */}
                             </View>
                         </View>
                     </View>
                 </View>
-                {
-                    listTree.map((item) => <Tree data={item} isShow={isShow} />)
-                }
+
+                {(listTree[0]) ? (
+                    listTree.map((item) => <Tree key={item.id} data={item} isShow={isShow} />)
+                ) : (
+                    <Text style={{ marginHorizontal: 50, marginTop: 100, color: theme.color_1 }}>Chưa có cây nào trong vườn. Trồng thêm cây mới ngay nào</Text>
+                )}
             </ScrollView>
             {(isShow) &&
                 <TouchableOpacity style={styles.plus}

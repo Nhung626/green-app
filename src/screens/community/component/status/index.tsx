@@ -40,13 +40,15 @@ const Status = ({ data }) => {
         React.useCallback(() => {
             const fetchData = async () => {
                 const id = await getUserId();
+                // setIsLike(status.userLiked)
+                // setLikeCount(status.countLike)
                 setUserId(id)
                 await getUserInfo()
                 await handleGetComment()
             }
             fetchData();
         }, []
-        ))
+    ))
     const handleLike = async () => {
         try {
             const req = new FormData();
@@ -55,7 +57,7 @@ const Status = ({ data }) => {
             if (res.payload) {
                 ToastAndroid.show('like', ToastAndroid.SHORT);
                 setLikeCount(likeCount + 1);
-                setIsLike(true)
+                setIsLike(true);
                 setLoading(false);
             } else {
                 ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT);

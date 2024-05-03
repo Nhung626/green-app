@@ -56,5 +56,66 @@ export const authSlice = createSlice({
                 loading: true,
             };
         })
+
+        builder.addCase(createGardenAction.pending, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+        builder.addCase(createGardenAction.fulfilled, (state, action) => {
+            return {
+                ...state,
+                loading: false,
+                res: action.payload.data
+            };
+        })
+        builder.addCase(createGardenAction.rejected, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+
+        builder.addCase(updateGardenAction.pending, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+        builder.addCase(updateGardenAction.fulfilled, (state, action) => {
+            return {
+                ...state,
+                loading: false,
+                res: action.payload.data
+            };
+        })
+        builder.addCase(updateGardenAction.rejected, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+
+        builder.addCase(deleteGardenAction.pending, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+        builder.addCase(deleteGardenAction.fulfilled, (state, action) => {
+            return {
+                ...state,
+                loading: false,
+                res: action.payload.data
+            };
+        })
+        builder.addCase(deleteGardenAction.rejected, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+
     }
 })

@@ -97,7 +97,7 @@ export const USER_INFO = {
     SEARCH: "/user-info/search",
     UPDATE: "/user-info/update",
     DELETE: "/user-info/delete",
-    UPDATE_AVATAR: "user-info/update-avata",
+    UPDATE_AVATAR: "user-info/update-avatar",
     FOLLOW: "user-info/follow",
     UNFOLLOW: "user-info/unfollow",
 }

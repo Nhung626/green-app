@@ -126,7 +126,7 @@ const Post = () => {
                 <Text style={styles.title}>{post.title}</Text>
                 <View style={{ flexDirection: 'row' }}>
                     <TouchableOpacity style={styles.tag}>
-                        <Text style={styles.subtitle}>subtitle</Text>
+                        <Text style={styles.subtitle}>{post.title}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.tag}>
                         <Text style={styles.subtitle}>{post.typeTree}</Text>
@@ -165,7 +165,7 @@ const Post = () => {
                                 <Image
                                     key={index}
                                     style={{
-                                        width: 370,
+                                        width: 360,
                                         marginHorizontal: 2, // Lấy width của thẻ chứa hình ảnh
                                         height: 180,
                                         resizeMode: 'cover',

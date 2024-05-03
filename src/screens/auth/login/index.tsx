@@ -33,11 +33,11 @@ const Login = () => {
                 if (res.payload) {
                     await clearAllAsyncStorage();
                     await setItemAsyncStorage(KEY_STORAGE.SAVED_INFO, JSON.stringify(res?.payload));
-                    await setItemAsyncStorage(KEY_STORAGE.USER_ID, JSON.stringify(res?.payload.id));
                     setAccount({
                         email: '',
                         password: '',
                     });
+                    await setItemAsyncStorage(KEY_STORAGE.USER_ID, JSON.stringify(res?.payload.id));
                     console.log(res.payload)
                     navigation.navigate(NAVIGATION_TITLE.TAB, { screen: NAVIGATION_TITLE.GREEN })
                     setLoading(false)

@@ -27,7 +27,7 @@ export const updateInfoUserAction = createAsyncThunk(
     }
 )
 
-export const updateAatarAction = createAsyncThunk(
+export const updateAvatarAction = createAsyncThunk(
     'user/updateAatarAction',
     async (data: {}) => {
         const res = await formdata.post(USER_INFO.UPDATE_AVATAR, data)

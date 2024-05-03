@@ -35,7 +35,7 @@ const UpdateInfo = () => {
     const route = useRoute<any>();
     const user = route.params.data;
     const [dateOfBirth, setDateOfBirth] = useState(new Date(user.userInfo.dateOfBirth));
-    const [viewDateOfBirth, setViewDateOfBirth] = useState(false)
+    const [viewDateOfBirth, setViewDateOfBirth] = useState(true)
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [avatar, setAvatar] = useState(`${MEDIA.SELF}?id=${user?.userInfo.avatarId}`);
     const [cover, setCover] = useState(`${MEDIA.SELF}?id=${user?.coverId}`);
@@ -44,10 +44,10 @@ const UpdateInfo = () => {
     const [phone, setPhone] = useState(user.userInfo.phone);
     const [address, setAddress] = useState(user.userInfo.address);
     const [gender, setGender] = useState(user.userInfo.gender);
-    const [isGenderP, setIsGenderP] = useState(user.userInfo.isGenderP)
-    const [isDateOfBirthP, setIsDateOfBirthP] = useState(user.userInfo.isDateOfBirthP)
-    const [isPhoneP, setIsPhoneP] = useState(user.userInfo.isPhoneP)
-    const [isAddressP, setIsAddressP] = useState(user.userInfo.isAddressP)
+    const [isGenderP, setIsGenderP] = useState(user.userInfo.GenderP)
+    const [isDateOfBirthP, setIsDateOfBirthP] = useState(user.userInfo.DateOfBirthP)
+    const [isPhoneP, setIsPhoneP] = useState(user.userInfo.PhoneP)
+    const [isAddressP, setIsAddressP] = useState(user.userInfo.AddressP)
     const [isLoading, setLoading] = useState(false)
     const navigation = useNavigation<any>()
     const listGender=[
@@ -106,8 +106,6 @@ const UpdateInfo = () => {
             if (res.every(result => result?.payload)) {
                 setLoading(false);
                 ToastAndroid.show('Cập nhật thành công!', ToastAndroid.SHORT);
-
-                navigation.goBack();
             } else {
                 ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT);
                 setLoading(false);

@@ -98,5 +98,65 @@ export const authSlice = createSlice({
                 loading: true,
             };
         })
+
+        builder.addCase(createStatusAction.pending, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+        builder.addCase(createStatusAction.fulfilled, (state, action) => {
+            return {
+                ...state,
+                loading: false,
+                res: action.payload.data
+            };
+        })
+        builder.addCase(createStatusAction.rejected, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+
+        builder.addCase(updateStatusAction.pending, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+        builder.addCase(updateStatusAction.fulfilled, (state, action) => {
+            return {
+                ...state,
+                loading: false,
+                res: action.payload.data
+            };
+        })
+        builder.addCase(deleteStatusAction.rejected, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+
+        builder.addCase(deleteStatusAction.pending, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+        builder.addCase(deleteStatusAction.fulfilled, (state, action) => {
+            return {
+                ...state,
+                loading: false,
+                res: action.payload.data
+            };
+        })
+        builder.addCase(deleteStatusAction.rejected, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
     }
 })

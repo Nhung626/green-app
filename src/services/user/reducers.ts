@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { getInfoUserAction, searchInfoUserAction, updateInfoUserAction } from "./actions"
+import { createInfoUserAction, getInfoUserAction, searchInfoUserAction, updateAvatarAction, updateInfoUserAction } from "./actions"
 
 interface IUSER {
     loading: boolean,
@@ -69,6 +69,46 @@ export const authSlice = createSlice({
             };
         })
         builder.addCase(updateInfoUserAction.rejected, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+
+        builder.addCase(createInfoUserAction.pending, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+        builder.addCase(createInfoUserAction.fulfilled, (state, action) => {
+            return {
+                ...state,
+                loading: false,
+                res: action.payload.data
+            };
+        })
+        builder.addCase(createInfoUserAction.rejected, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+
+        builder.addCase(updateAvatarAction.pending, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+        builder.addCase(updateAvatarAction.fulfilled, (state, action) => {
+            return {
+                ...state,
+                loading: false,
+                res: action.payload.data
+            };
+        })
+        builder.addCase(updateAvatarAction.rejected, (state) => {
             return {
                 ...state,
                 loading: true,

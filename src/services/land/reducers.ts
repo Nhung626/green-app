@@ -56,5 +56,65 @@ export const authSlice = createSlice({
                 loading: true,
             };
         })
+
+        builder.addCase(deleteLandAction.pending, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+        builder.addCase(deleteLandAction.fulfilled, (state, action) => {
+            return {
+                ...state,
+                loading: false,
+                res: action.payload.data
+            };
+        })
+        builder.addCase(deleteLandAction.rejected, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+
+        builder.addCase(createLandAction.pending, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+        builder.addCase(createLandAction.fulfilled, (state, action) => {
+            return {
+                ...state,
+                loading: false,
+                res: action.payload.data
+            };
+        })
+        builder.addCase(createLandAction.rejected, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+
+        builder.addCase(updateLandAction.pending, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
+        builder.addCase(updateLandAction.fulfilled, (state, action) => {
+            return {
+                ...state,
+                loading: false,
+                res: action.payload.data
+            };
+        })
+        builder.addCase(updateLandAction.rejected, (state) => {
+            return {
+                ...state,
+                loading: true,
+            };
+        })
     }
 })

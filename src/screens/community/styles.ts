@@ -11,11 +11,12 @@ const styles = () => {
             fontWeight: "600",
             color: theme.text_3,
             paddingHorizontal: 15,
-            paddingVertical: 10,
             backgroundColor: theme.color_2,
+            alignContent: 'center',
             justifyContent: 'space-between',
         },
         headerText: {
+            marginTop: 10,
             color: theme.color_1,
             fontSize: 24,
         },

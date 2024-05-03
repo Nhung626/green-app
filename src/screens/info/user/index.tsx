@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Text, StyleSheet, StatusBar, View, Image, ImageBackground, TouchableOpacity, ScrollView, Alert, ToastAndroid } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -6,7 +6,7 @@ import { Avatar } from '@rneui/themed';
 import st from './styles'
 import useTheme from '../../../hooks/useTheme'
 import { useDispatch } from 'react-redux'
-import { useNavigation, useIsFocused, useRoute } from "@react-navigation/native";
+import { useNavigation, useIsFocused, useRoute,useFocusEffect} from "@react-navigation/native";
 import { getInfoUserAction, searchInfoUserAction } from '../../../services/user/actions';
 import { getGardenAction, searchGardenAction, updateCoverAction } from '../../../services/garden/actions';
 import { getItemObjectAsyncStorage } from '../../../../utils/asyncStorage';
@@ -22,10 +22,10 @@ const MyProfile = () => {
   const styles = st();
   const theme = useTheme();
   const dispatch = useDispatch<any>()
-  const isFocused = useIsFocused()
   const route = useRoute<any>()
   const gardenInfo = route.params.user;
-  const userInfo = route.params.user.userInfo;
+  const userInfo = route.params. user.userInfo;
+  const [avatar, setAvatar] = useState();
   const [loading, setLoading] = useState(false)
   const navigation = useNavigation<any>();
   let userId
@@ -33,46 +33,71 @@ const MyProfile = () => {
     userId = await getItemObjectAsyncStorage(KEY_STORAGE.USER_ID);
   }
 
-  const handleUpdateAvatar = async (avatar) => {
-    setLoading(true)
-    const req = new FormData();
-    req.append('userId', gardenInfo.userId)
-    if (avatar) {
-      //@ts-ignore
-      userInfo.append(`avatar`, {
-        uri: avatar,
-        type: 'image/png',
-        name: `avatar.png`,
-      });
-    }
-    try {
-      const res = await dispatch(updateCoverAction(req));
-      if (res?.payload) {
-        setLoading(false);
-        const id = res.payload.body.id
-        // onChangeGardenInfo('coverId', { id })
-        ToastAndroid.show('Cập nhật avatar thành công!', ToastAndroid.SHORT)
-      }
-    } catch (err) {
-      console.error('Error update avatar:', err);
-      ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT)
-      setLoading(false);
-    }
-  }
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     getUserInfo();
+  //   }, [avatar])
+  // );
 
-  const pickAvata = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 4],
-      quality: 1,
-    });
 
-    if (!result.canceled) {
-      await handleUpdateAvatar(result.assets[0].uri)
-      return
-    }
-  };
+  // const getUserInfo = async () => {
+  //   await getUserId();
+  //   setLoading(true);
+  //   const req = new FormData();
+  //   req.append("userId", userId)
+  //   try {
+  //     const res = await dispatch(searchGardenAction(req));
+  //     console.log('garden: ', res.payload.body[0])
+  //     setGardenInfo(res.payload.body[0]);
+  //     setUserInfo(res.payload.body[0].userInfo);
+  //     console.log(userInfo)
+  //     setLoading(false);
+  //   } catch (err) {
+  //     console.error('Error fetching user info:', err);
+  //     setLoading(false);
+  //   }
+  // };
+
+  // const handleUpdateAvatar = async (avatar) => {
+  //   setLoading(true)
+  //   const req = new FormData();
+  //   req.append('userId', gardenInfo.userId)
+  //   if (avatar) {
+  //     //@ts-ignore
+  //     userInfo.append(`avatar`, {
+  //       uri: avatar,
+  //       type: 'image/png',
+  //       name: `avatar.png`,
+  //     });
+  //   }
+  //   try {
+  //     const res = await dispatch(updateCoverAction(req));
+  //     if (res?.payload) {
+  //       setLoading(false);
+  //       const id = res.payload.body.id
+  //       // onChangeGardenInfo('coverId', { id })
+  //       ToastAndroid.show('Cập nhật avatar thành công!', ToastAndroid.SHORT)
+  //     }
+  //   } catch (err) {
+  //     console.error('Error update avatar:', err);
+  //     ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT)
+  //     setLoading(false);
+  //   }
+  // }
+
+  // const pickAvata = async () => {
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.All,
+  //     allowsEditing: true,
+  //     aspect: [4, 4],
+  //     quality: 1,
+  //   });
+
+  //   if (!result.canceled) {
+  //     await handleUpdateAvatar(result.assets[0].uri)
+  //     return
+  //   }
+  // };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -85,7 +110,7 @@ const MyProfile = () => {
         </TouchableOpacity>
         <Text style={styles.headerText}>My Profile</Text>
         <TouchableOpacity
-          onPress={() => navigation.navigate(NAVIGATION_TITLE.UPDATE_INFO, {data: gardenInfo})}
+          onPress={() => navigation.navigate(NAVIGATION_TITLE.UPDATE_INFO, { data: gardenInfo })}
         >
           <Icon name="edit" style={{ marginRight: 0, marginTop: 5 }} color={theme.color_1} size={20}></Icon>
         </TouchableOpacity>
@@ -94,11 +119,11 @@ const MyProfile = () => {
         source={require('../../../../assets/images/paper.png')}
         resizeMode="cover">
         <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-          <Image source={{ uri: `${MEDIA.SELF}?id=${userInfo?.avatarId}` }} style={styles.avata} />
-          <TouchableOpacity style={styles.iconCamera}
+          <Image source={{ uri: `${MEDIA.SELF}?id=${gardenInfo.userInfo?.avatarId}` }} style={styles.avata} />
+          {/* <TouchableOpacity style={styles.iconCamera}
             onPress={() => { pickAvata() }}>
             <Icon name='camera' size={15} color={'gray'}></Icon>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <View style={{}}>
           <Text style={styles.userName}>VƯỜN CỦA {gardenInfo?.name.toUpperCase()}</Text>
@@ -148,13 +173,14 @@ const MyProfile = () => {
                 resizeMode="contain"
               />
               <Text style={styles.text}>
-                Đăng xuất
+                SĐT: {userInfo.phone}
               </Text>
             </View>
           </TouchableOpacity>
         </ScrollView>
         {/* <Loading visiable={loading} /> */}
       </View>
+      <Loading visiable={loading}></Loading>
     </SafeAreaView >
   );
 };

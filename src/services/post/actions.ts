@@ -30,7 +30,7 @@ export const updatePostAction = createAsyncThunk(
 export const searchPostAction = createAsyncThunk(
     'post/searchPostAction',
     async (data: {}) => {
-        const res = await httpClient.get(POST.SEARCH, data)
+        const res = await formdata.post(POST.SEARCH, data)
         return res.data
     }
 )

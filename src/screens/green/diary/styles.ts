@@ -73,6 +73,8 @@ const styles = () => {
       color: theme.text_3,
       paddingHorizontal: 15,
       paddingVertical: 20,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
       textAlign: 'center',
     },
 

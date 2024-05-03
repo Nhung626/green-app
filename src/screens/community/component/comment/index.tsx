@@ -142,7 +142,7 @@ const Comment = ({ data }) => {
         <View style={{ marginVertical: 5, }}>
             <View style={{ flexDirection: 'row' }}>
                 <Avatar.Image size={25} source={{ uri: `${MEDIA.SELF}?id=${auth?.userInfo.avatarId}` }} />
-                <View style={{ marginLeft: 5, backgroundColor: theme.color_2, paddingHorizontal: 8, paddingVertical: 5, borderRadius: 5, marginRight: 10, width: 300 }}>
+                <View style={{ marginLeft: 5, backgroundColor: theme.color_2, paddingHorizontal: 8, paddingVertical: 5, borderRadius: 5, marginRight: 10}}>
                     <Text style={styles.username}>{auth?.name}</Text>
                     <Text style={styles.comment}>{comment.content}</Text>
                 </View>
@@ -185,12 +185,12 @@ const Comment = ({ data }) => {
                             color: theme.color_4,
                         }}>Reply</Text>
                     </TouchableOpacity >
-                    <Text style={{
+                    {/* <Text style={{
                         fontSize: 12,
                         color: theme.color_4,
-                    }}>{moment(comment.createdAt).fromNow()}</Text>
+                    }}>{moment(comment.createdAt).fromNow()}</Text> */}
                     {(comment.userId === userId) &&
-                        <View style={{ flexDirection: 'row', marginLeft: 83 }}>
+                        <View style={{ flexDirection: 'row' }}>
                             <TouchableOpacity style={{ marginRight: 5, }}
                                 onPress={() => handleDeleteComment()}>
                                 <Text style={{
@@ -202,7 +202,7 @@ const Comment = ({ data }) => {
                     }
                 </View>
 
-                {(data.countReply > 0 && showSubComment) ? (
+                {/* {(data.countReply > 0 && showSubComment) ? (
                     <TouchableOpacity
                         onPress={() => setShowSubComment(true)}
                     >
@@ -212,7 +212,7 @@ const Comment = ({ data }) => {
                     </TouchableOpacity>
                 ) : (
                     <SubComment data={comment.id} />
-                )}
+                )} */}
             </View>
         </View >
     )

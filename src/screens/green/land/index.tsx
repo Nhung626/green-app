@@ -40,6 +40,27 @@ const ListLand = ({ data, isShow }) => {
       fetchData();
     }, [])
   );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        setLoading(true)
+        try {
+          const res = await dispatch(searchLandAction({ userId: data }));
+          if (res.payload) {
+            setListLand(res.payload.body);
+          }
+          setLoading(false);
+        } catch (error) {
+          console.error('Error fetching garden info:', error);
+          ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT);
+          setLoading(false);
+
+        };
+      }
+      fetchData();
+    }, [])
+  );
   return (
     <SafeAreaView style={styles.container}>
       <FlatList

@@ -16,7 +16,7 @@ import { getItemObjectAsyncStorage } from '../../../utils/asyncStorage';
 import { KEY_STORAGE } from '../../constants/storage';
 import { searchGardenAction } from '../../services/garden/actions';
 import Loading from '../../../utils/loading/loading';
-import { Avatar } from 'react-native-paper';
+import { Avatar, Searchbar } from 'react-native-paper';
 import { MEDIA } from '../../constants/api';
 import { NAVIGATION_TITLE } from '../../constants/navigation';
 
@@ -30,7 +30,7 @@ const Community = () => {
   const [listStatus, setListStatus] = useState([]);
   const [keyword, setKeyword] = useState('')
   const [user, setUser] = useState<any>();
-  
+
   const onRefresh = async () => {
     setRefreshing(true);
     await handelGetStatus()
@@ -45,7 +45,7 @@ const Community = () => {
   useFocusEffect(
     React.useCallback(() => {
       const fetchData = async () => {
-        await getUserInfo()
+        getUserInfo()
         await handelGetStatus()
       }
       fetchData();
@@ -76,6 +76,7 @@ const Community = () => {
       if (res?.payload) {
         console.log('status', res?.payload.body)
         setListStatus(res?.payload.body);
+        setKeyword('');
       } else {
         ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT);
       }
@@ -91,10 +92,16 @@ const Community = () => {
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={theme.color_2} />
       <View style={styles.header}>
-        <Text style={styles.headerText}>Green</Text>
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <Icon name="search" style={{ marginLeft: 260, marginTop: 5 }} color={theme.color_1} size={25}></Icon>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        <Searchbar
+          placeholder="Search"
+          onChangeText={setKeyword}
+          onIconPress={handelGetStatus}
+          value={keyword}
+          style={{ width: 360, backgroundColor: theme.color_2 }}
+        />
       </View>
       {/* <ScrollView> */}
 
@@ -113,7 +120,9 @@ const Community = () => {
           }}>Chia sẻ vô đây nhé.</Text>
         </View>
       </TouchableOpacity>
-      <FlatList
+      
+      {(listStatus[0]) ? (
+        <FlatList
         data={listStatus}
         renderItem={({ item }) => <Status data={item} />}
         keyExtractor={item => item.id}
@@ -121,6 +130,9 @@ const Community = () => {
         onRefresh={onRefresh} // Hàm được gọi khi làm mới
         onScroll={() => { onRefresh }}
       />
+      ) : (
+        <Text style={{marginLeft: 100, marginTop: 100, color:theme.color_1}}>Không có kết quả phù hợp.</Text>
+      )}
       <Loading visiable={loading}></Loading>
     </SafeAreaView>
   );

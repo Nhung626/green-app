@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Text, ToastAndroid, TouchableOpacity, View } from 'react-native';
 import { SCREEN_HEIGHT } from '../../../utils/Dimension'
 import { StatusBar } from 'expo-status-bar';
@@ -36,15 +36,14 @@ const Database = () => {
     userId = await getItemObjectAsyncStorage(KEY_STORAGE.USER_ID);
   }
 
+
   useFocusEffect(
-    React.useCallback(() => {
-      const fetchData = async () => {
-        await getUserInfo()
-        await handelGetPost()
-      }
-      fetchData();
-    }, []
-    ))
+    useCallback(() => {
+      getUserInfo()
+      handelGetPost()
+    }, [])
+  );
+
 
   const getUserInfo = async () => {
     await getUserId();
@@ -69,6 +68,7 @@ const Database = () => {
       if (res?.payload) {
         console.log('status', res?.payload.body)
         setListPost(res?.payload.body);
+        setSearchQuery('')
       } else {
         ToastAndroid.show('Có lỗi!', ToastAndroid.SHORT);
       }
@@ -82,30 +82,35 @@ const Database = () => {
   }
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={theme.color_1}></StatusBar>
       <Searchbar
         placeholder="Search"
         onChangeText={setSearchQuery}
+        onIconPress={handelGetPost}
         value={searchQuery}
         style={{ marginTop: 20, marginHorizontal: 15 }}
       />
       <View>
         <View>
           <Text style={styles.title}>Gợi ý</Text>
-          <FlatList
-            data={listPost}
-            renderItem={({ item }) => <APost data={item} />}
-            keyExtractor={item => item.id}
-            style={{
-              marginBottom: 50,
-            }}
-            refreshing={refreshing} // Trạng thái làm mới
-            onRefresh={onRefresh} // Hàm được gọi khi làm mới
-            onScroll={() => { onRefresh }}
-          // onEndReached={onEndReached} // Hàm được gọi khi người dùng đến cuối danh sách
-          // onEndReachedThreshold={0.1}
-          />
+          {(listPost[0]) ? (
+            <FlatList
+              data={listPost}
+              renderItem={({ item }) => <APost data={item} />}
+              keyExtractor={item => item.id}
+              style={{
+                marginBottom: 180,
+              }}
+              refreshing={refreshing} // Trạng thái làm mới
+              onRefresh={onRefresh} // Hàm được gọi khi làm mới
+              onScroll={() => { onRefresh }}
+            // onEndReached={onEndReached} // Hàm được gọi khi người dùng đến cuối danh sách
+            // onEndReachedThreshold={0.1}
+            />
+          ) : (
+            <Text style={{ marginLeft: 100, marginTop: 100, color: theme.color_1 }}>Không có kết quả phù hợp.</Text>
+          )}
         </View>
 
       </View>

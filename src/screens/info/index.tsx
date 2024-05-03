@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux'
 import { useNavigation, useIsFocused } from "@react-navigation/native";
 import { useFocusEffect } from '@react-navigation/native';
 
-import { getInfoUserAction, searchInfoUserAction, updateAatarAction } from '../../services/user/actions';
+import { getInfoUserAction, searchInfoUserAction, updateAvatarAction } from '../../services/user/actions';
 import { getGardenAction, searchGardenAction, updateCoverAction } from '../../services/garden/actions';
 import { clearAllAsyncStorage, getItemObjectAsyncStorage } from '../../../utils/asyncStorage';
 import { KEY_STORAGE } from '../../constants/storage';
@@ -37,7 +37,7 @@ const Info = () => {
   useFocusEffect(
     useCallback(() => {
       getUserInfo();
-    }, [])
+    }, [avatar])
   );
 
 
@@ -79,7 +79,7 @@ const Info = () => {
       });
     }
     try {
-      const res = await dispatch(updateAatarAction(req));
+      const res = await dispatch(updateAvatarAction(req));
       if (res?.payload) {
         setLoading(false);
         setAvatar(null);
